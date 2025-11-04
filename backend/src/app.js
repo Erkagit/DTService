@@ -2,7 +2,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma, OrderStatus } from "@prisma/client";
 
 dotenv.config();
 
@@ -17,26 +17,6 @@ const ah = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch
 // ——— health
 app.get("/health", (_req, res) => res.json({ ok: true, service: "dts-backend" }));
 
-// --- Devices ---
-app.post("/api/vehicles", ah(async (req, res) => {
-  console.log("🚚 /api/vehicles called", req.body); // <--- 1
-  const { name, plateNo, deviceId } = req.body || {};
-  if (!name) {
-    console.log("❗ missing name");
-    return res.status(400).json({ error: "name is required" });
-  }
-  try {
-    const v = await prisma.vehicle.create({
-      data: { name, plateNo, deviceId }
-    });
-    console.log("✅ created", v); // <--- 2
-    res.status(201).json(v);
-  } catch (e) {
-    console.error("❌ error", e);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-}));
-
 // TEMP: Prisma models diagnostic
 app.get("/__diag", (_req, res) => {
   // Prisma-н дотоод DMMF-ээс моделийн нэрсийг уншина
@@ -45,7 +25,7 @@ app.get("/__diag", (_req, res) => {
   res.json({ models });
 });
 
-
+// --- Devices ---
 app.get("/api/devices", ah(async (_req, res) => {
   const rows = await prisma.device.findMany({ orderBy: { id: "asc" } });
   res.json(rows);

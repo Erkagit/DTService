@@ -12,3 +12,99 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Enums
+enum Role {
+  ADMIN
+  OPERATOR
+  CLIENT_ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Models
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+  orders    Order[]
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  name             String
+  role             Role
+  companyId        Int?
+  company          Company?  @relation(fields: [companyId], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  createdOrders    Order[]   @relation("CreatedOrders")
+  assignedOrders   Order[]   @relation("AssignedOrders")
+}
+
+model Device {
+  id        Int      @id @default(autoincrement())
+  deviceId  String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  vehicle   Vehicle?
+}
+
+model Vehicle {
+  id        Int            @id @default(autoincrement())
+  name      String
+  plateNo   String?        @unique
+  deviceId  Int?           @unique
+  device    Device?        @relation(fields: [deviceId], references: [id])
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  orders    Order[]
+  pings     LocationPing[]
+}
+
+model Order {
+  id           Int                   @id @default(autoincrement())
+  code         String                @unique
+  companyId    Int
+  company      Company               @relation(fields: [companyId], references: [id])
+  origin       String
+  destination  String
+  vehicleId    Int?
+  vehicle      Vehicle?              @relation(fields: [vehicleId], references: [id])
+  status       OrderStatus           @default(PENDING)
+  createdById  Int
+  createdBy    User                  @relation("CreatedOrders", fields: [createdById], references: [id])
+  assignedToId Int?
+  assignedTo   User?                 @relation("AssignedOrders", fields: [assignedToId], references: [id])
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  histories    OrderStatusHistory[]
+}
+
+model OrderStatusHistory {
+  id        Int         @id @default(autoincrement())
+  orderId   Int
+  order     Order       @relation(fields: [orderId], references: [id])
+  status    OrderStatus
+  note      String?
+  at        DateTime    @default(now())
+}
+
+model LocationPing {
+  id        Int      @id @default(autoincrement())
+  vehicleId Int
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  lat       Float
+  lng       Float
+  speedKph  Float?
+  heading   Float?
+  at        DateTime @default(now())
+}
