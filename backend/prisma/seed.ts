@@ -1,9 +1,13 @@
 import { PrismaClient, Role, OrderStatus } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting seed...\n');
+  console.log('🌱 Starting seed with JWT authentication...\n');
+
+  // Hash password
+  const hashedPassword = await bcrypt.hash('password123', 10);
 
   // Companies
   console.log('Creating companies...');
@@ -17,12 +21,13 @@ async function main() {
 
   console.log('✅ Companies:', acme.name, erka.name);
 
-  // Users
-  console.log('\nCreating users...');
+  // Users with passwords
+  console.log('\nCreating users with passwords...');
   const admin = await prisma.user.create({
     data: {
       email: 'admin@dts.local',
       name: 'Admin',
+      password: hashedPassword,
       role: Role.ADMIN,
     },
   });
@@ -31,6 +36,7 @@ async function main() {
     data: {
       email: 'op@dts.local',
       name: 'Operator',
+      password: hashedPassword,
       role: Role.OPERATOR,
     },
   });
@@ -39,6 +45,7 @@ async function main() {
     data: {
       email: 'client@acme.local',
       name: 'Client Admin',
+      password: hashedPassword,
       role: Role.CLIENT_ADMIN,
       companyId: acme.id,
     },
@@ -85,7 +92,7 @@ async function main() {
 
   console.log('✅ Vehicles:', vehicle1.plateNo, vehicle2.plateNo, vehicle3.plateNo);
 
-  // Orders with different statuses
+  // Orders
   console.log('\nCreating orders...');
   
   const order1 = await prisma.order.create({
@@ -107,7 +114,7 @@ async function main() {
       { orderId: order1.id, status: OrderStatus.LOADING, note: 'Started loading' },
       { orderId: order1.id, status: OrderStatus.CN_EXPORT_CUSTOMS, note: 'China export customs' },
       { orderId: order1.id, status: OrderStatus.MN_IMPORT_CUSTOMS, note: 'Mongolia import customs' },
-      { orderId: order1.id, status: OrderStatus.IN_TRANSIT, note: 'On the way to destination' },
+      { orderId: order1.id, status: OrderStatus.IN_TRANSIT, note: 'On the way' },
     ],
   });
 
@@ -126,74 +133,27 @@ async function main() {
 
   await prisma.orderStatusHistory.createMany({
     data: [
-      { orderId: order2.id, status: OrderStatus.PENDING, note: 'Order created' },
-      { orderId: order2.id, status: OrderStatus.LOADING, note: 'Loading in progress' },
+      { orderId: order2.id, status: OrderStatus.PENDING, note: 'Created' },
+      { orderId: order2.id, status: OrderStatus.LOADING, note: 'Loading' },
     ],
   });
 
-  const order3 = await prisma.order.create({
-    data: {
-      code: 'DTS-2025-0003',
-      companyId: acme.id,
-      origin: 'Choir',
-      destination: 'Sainshand',
-      status: OrderStatus.PENDING,
-      createdById: clientAdmin.id,
-    },
-  });
-
-  await prisma.orderStatusHistory.create({
-    data: { orderId: order3.id, status: OrderStatus.PENDING, note: 'Waiting for assignment' },
-  });
-
-  const order4 = await prisma.order.create({
-    data: {
-      code: 'DTS-2025-0004',
-      companyId: acme.id,
-      origin: 'Zamyn-Uud',
-      destination: 'Ulaanbaatar',
-      vehicleId: vehicle3.id,
-      status: OrderStatus.COMPLETED,
-      createdById: admin.id,
-      assignedToId: operator.id,
-    },
-  });
-
-  await prisma.orderStatusHistory.createMany({
-    data: [
-      { orderId: order4.id, status: OrderStatus.PENDING, note: 'Order created' },
-      { orderId: order4.id, status: OrderStatus.LOADING, note: 'Loading' },
-      { orderId: order4.id, status: OrderStatus.IN_TRANSIT, note: 'In transit' },
-      { orderId: order4.id, status: OrderStatus.ARRIVED_AT_SITE, note: 'Arrived at destination' },
-      { orderId: order4.id, status: OrderStatus.UNLOADED, note: 'Unloading completed' },
-      { orderId: order4.id, status: OrderStatus.COMPLETED, note: 'Order completed' },
-    ],
-  });
-
-  console.log('✅ Orders:', order1.code, order2.code, order3.code, order4.code);
+  console.log('✅ Orders:', order1.code, order2.code);
 
   // GPS Pings
   console.log('\nCreating GPS pings...');
   await prisma.locationPing.createMany({
     data: [
-      { vehicleId: vehicle1.id, lat: 47.9184, lng: 106.9177, heading: 180 },
-      { vehicleId: vehicle2.id, lat: 49.4671, lng: 104.0448,  heading: 90 },
-      { vehicleId: vehicle3.id, lat: 43.6532, lng: 111.8251, heading: 0 },
+      { vehicleId: vehicle1.id, lat: 47.9184, lng: 106.9177, speedKph: 65.5, heading: 180 },
+      { vehicleId: vehicle2.id, lat: 49.4671, lng: 104.0448, speedKph: 45.0, heading: 90 },
+      { vehicleId: vehicle3.id, lat: 43.6532, lng: 111.8251, speedKph: 0, heading: 0 },
     ],
   });
 
   console.log('✅ GPS pings created');
 
   console.log('\n🎉 Seed completed successfully!\n');
-  console.log('📊 Summary:');
-  console.log('  - 2 Companies');
-  console.log('  - 3 Users (Admin, Operator, Client Admin)');
-  console.log('  - 3 Devices');
-  console.log('  - 3 Vehicles (with driver info)');
-  console.log('  - 4 Orders (various statuses)');
-  console.log('  - 15 Order history entries');
-  console.log('  - 3 GPS Pings\n');
-  console.log('🔐 Test accounts:');
+  console.log('🔐 Login credentials (password: password123):');
   console.log('  - admin@dts.local (Admin)');
   console.log('  - op@dts.local (Operator)');
   console.log('  - client@acme.local (Client Admin)\n');

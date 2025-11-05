@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
-import { authMiddleware } from './middleware/auth';
+import { authMiddleware, requireRole } from './middleware/auth';
+import { generateToken } from './utils/jwt';
 import { companyRouter } from './routes/company';
 import { userRouter } from './routes/user';
 import { deviceRouter } from './routes/device';
@@ -30,18 +32,19 @@ app.get('/health', (_req, res) => {
     ok: true, 
     service: 'dts-backend', 
     timestamp: new Date(),
-    version: '1.0.0'
+    version: '1.0.0',
+    jwt: 'enabled'
   });
 });
 
-// Auth login (public)
+// Auth login (public) - WITH JWT & PASSWORD
 app.post('/api/auth/login', async (req, res) => {
   try {
-    console.log('Login attempt:', req.body);
-    const { email } = req.body;
+    console.log('Login attempt:', { email: req.body.email });
+    const { email, password } = req.body;
     
-    if (!email) {
-      return res.status(400).json({ error: 'Email required' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
     }
     
     const user = await prisma.user.findUnique({ 
@@ -50,13 +53,36 @@ app.post('/api/auth/login', async (req, res) => {
     });
     
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
+
+    // Verify password
+    if (!user.password) {
+      return res.status(401).json({ error: 'Account password not set. Contact administrator.' });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Generate JWT token
+    const token = generateToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      companyId: user.companyId || undefined,
+    });
     
     console.log('Login successful:', user.email);
+    
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = user;
+    
     res.json({ 
-      user,
-      message: 'Login successful. Use x-user-id header with value: ' + user.id
+      user: userWithoutPassword,
+      token,
+      message: 'Login successful'
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -64,7 +90,29 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Apply auth middleware to protected routes
+// Verify token endpoint (protected)
+app.get('/api/auth/me', authMiddleware, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+      include: { company: true }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = user;
+
+    res.json({ user: userWithoutPassword });
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Apply JWT auth middleware to protected routes
 app.use(authMiddleware);
 
 // Protected routes
