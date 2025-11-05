@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User } from '@/services/api';
+import type { User } from '@/types';
 
 interface AuthContextType {
   user: User | null;
@@ -17,25 +17,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load user from localStorage
-    const storedUser = localStorage.getItem('user');
-    const userId = localStorage.getItem('userId');
-    if (storedUser && userId) {
-      setUser(JSON.parse(storedUser));
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user');
+      const userId = localStorage.getItem('userId');
+      if (storedUser && userId) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error('Failed to parse user from localStorage', error);
+          localStorage.removeItem('user');
+          localStorage.removeItem('userId');
+        }
+      }
     }
     setIsLoading(false);
   }, []);
 
   const login = (user: User) => {
     setUser(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('userId', user.id.toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('userId', user.id.toString());
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('userId');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+      localStorage.removeItem('userId');
+    }
   };
 
   return (

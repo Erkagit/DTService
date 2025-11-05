@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { vehiclesApi } from '@/services/api';
 import api from '@/services/api';
-import { Truck, ArrowLeft, Activity, Plus, X } from 'lucide-react';
+import { Truck, ArrowLeft, Activity, Plus, X, User, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthProvider';
 
@@ -17,8 +17,9 @@ export default function VehiclesPage() {
   const [showDeviceForm, setShowDeviceForm] = useState(false);
   
   const [vehicleForm, setVehicleForm] = useState({
-    name: '',
     plateNo: '',
+    driverName: '',
+    driverPhone: '',
     deviceId: '',
   });
 
@@ -45,15 +46,16 @@ export default function VehiclesPage() {
   const createVehicleMutation = useMutation({
     mutationFn: async (data: any) => {
       return api.post('/api/vehicles', {
-        name: data.name,
         plateNo: data.plateNo,
+        driverName: data.driverName,
+        driverPhone: data.driverPhone,
         deviceId: data.deviceId ? parseInt(data.deviceId) : undefined,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       setShowCreateForm(false);
-      setVehicleForm({ name: '', plateNo: '', deviceId: '' });
+      setVehicleForm({ plateNo: '', driverName: '', driverPhone: '', deviceId: '' });
       alert('Vehicle created successfully!');
     },
     onError: (error: any) => {
@@ -131,9 +133,9 @@ export default function VehiclesPage() {
       {/* Create Vehicle Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900">Create New Vehicle</h2>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-900">Add New Vehicle</h2>
               <button
                 onClick={() => setShowCreateForm(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition"
@@ -145,20 +147,6 @@ export default function VehiclesPage() {
             <form onSubmit={handleVehicleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Vehicle Name *
-                </label>
-                <input
-                  type="text"
-                  value={vehicleForm.name}
-                  onChange={(e) => setVehicleForm({ ...vehicleForm, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="Hino 1"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Plate Number *
                 </label>
                 <input
@@ -167,6 +155,34 @@ export default function VehiclesPage() {
                   onChange={(e) => setVehicleForm({ ...vehicleForm, plateNo: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="UBX-1234"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Driver Name *
+                </label>
+                <input
+                  type="text"
+                  value={vehicleForm.driverName}
+                  onChange={(e) => setVehicleForm({ ...vehicleForm, driverName: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="Батаа"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Driver Phone *
+                </label>
+                <input
+                  type="tel"
+                  value={vehicleForm.driverPhone}
+                  onChange={(e) => setVehicleForm({ ...vehicleForm, driverPhone: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="+976-99001122"
                   required
                 />
               </div>
@@ -265,7 +281,7 @@ export default function VehiclesPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-40 bg-white rounded-xl animate-pulse"></div>
+              <div key={i} className="h-48 bg-white rounded-xl animate-pulse"></div>
             ))}
           </div>
         ) : vehicles && vehicles.length > 0 ? (
@@ -276,9 +292,18 @@ export default function VehiclesPage() {
                 className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900">{vehicle.name}</h3>
-                    <p className="text-2xl font-bold text-green-600 mt-1">{vehicle.plateNo}</p>
+                  <div className="flex-1">
+                    <p className="text-3xl font-bold text-green-600 mb-2">{vehicle.plateNo}</p>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <User className="w-4 h-4 text-gray-400" />
+                        <span className="font-medium">{vehicle.driverName}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Phone className="w-4 h-4 text-gray-400" />
+                        <span>{vehicle.driverPhone}</span>
+                      </div>
+                    </div>
                   </div>
                   <div className="p-3 bg-green-100 rounded-lg">
                     <Truck className="w-6 h-6 text-green-600" />
@@ -286,15 +311,15 @@ export default function VehiclesPage() {
                 </div>
 
                 {vehicle.device && (
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-sm pt-3 border-t border-gray-100">
                     <div className="flex items-center gap-2 text-gray-600">
                       <Activity className="w-4 h-4" />
-                      <span>Device: <span className="font-medium text-gray-900">{vehicle.device.deviceId}</span></span>
+                      <span>GPS: <span className="font-medium text-gray-900">{vehicle.device.deviceId}</span></span>
                     </div>
                     {vehicle.pings && vehicle.pings.length > 0 && (
-                      <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg mt-3">
+                      <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span>Active - Last ping: {new Date(vehicle.pings[0].at).toLocaleTimeString()}</span>
+                        <span>Last ping: {new Date(vehicle.pings[0].at).toLocaleTimeString()}</span>
                       </div>
                     )}
                   </div>

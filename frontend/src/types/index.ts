@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 // Backend API Types
 export interface User {
   id: number;
@@ -20,6 +22,7 @@ export interface Company {
 }
 
 export interface Vehicle {
+  name: ReactNode;
   id: number;
   plateNo: string;
   driverName: string;
