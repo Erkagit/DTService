@@ -1,103 +1,123 @@
-import { PrismaClient, Role, OrderStatus, DeliveryStatus } from '@prisma/client'
-const prisma = new PrismaClient()
+import { PrismaClient, Role, OrderStatus } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 async function main() {
-  // company
-  const acme = await prisma.company.upsert({
-    where: { name: 'Demo Logistics' },
-    update: {},
-    create: { name: 'Demo Logistics' },
-  })
+  // Companies
+  const acme = await prisma.company.create({
+    data: { name: 'Demo Logistics' },
+  });
 
-  // users
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@dts.local' },
-    update: {},
-    create: { email: 'admin@dts.local', name: 'Batchuluun', role: Role.ADMIN },
-  })
+  const erka = await prisma.company.create({
+    data: { name: 'Erka Transport' },
+  });
 
-  const operator = await prisma.user.upsert({
-    where: { email: 'op@dts.local' },
-    update: {},
-    create: { email: 'op@dts.local', name: 'Operator', role: Role.OPERATOR },
-  })
+  console.log('✅ Companies created:', { acme, erka });
 
-  const clientAdmin = await prisma.user.upsert({
-    where: { email: 'client@acme.local' },
-    update: {},
-    create: { email: 'client@acme.local', name: 'Client Admin', role: Role.CLIENT_ADMIN, companyId: acme.id },
-  })
+  // Users
+  const admin = await prisma.user.create({
+    data: {
+      email: 'admin@dts.local',
+      name: 'Admin',
+      role: Role.ADMIN,
+    },
+  });
 
-  // vehicles + devices
-  const device1 = await prisma.device.create({ data: { deviceId: 'GPS-0001' } })
+  const operator = await prisma.user.create({
+    data: {
+      email: 'op@dts.local',
+      name: 'Operator',
+      role: Role.OPERATOR,
+    },
+  });
+
+  const clientAdmin = await prisma.user.create({
+    data: {
+      email: 'client@acme.local',
+      name: 'Client Admin',
+      role: Role.CLIENT_ADMIN,
+      companyId: acme.id,
+    },
+  });
+
+  console.log('✅ Users created:', { admin, operator, clientAdmin });
+
+  // Devices
+  const device1 = await prisma.device.create({
+    data: { deviceId: 'GPS-0001' },
+  });
+
+  const device2 = await prisma.device.create({
+    data: { deviceId: 'GPS-0002' },
+  });
+
+  console.log('✅ Devices created:', { device1, device2 });
+
+  // Vehicles
   const vehicle1 = await prisma.vehicle.create({
-    data: { name: 'Hino 1', plateNo: 'УНД-8701', deviceId: device1.id }
-  })
+    data: {
+      plateNo: 'UBX-1234',
+      driverName: 'Батаа',
+      driverPhone: '+976-99001122',
+      deviceId: device1.id,
+    },
+  });
 
-  const device2 = await prisma.device.create({ data: { deviceId: 'GPS-0002' } })
   const vehicle2 = await prisma.vehicle.create({
-    data: { name: 'Truck 2', plateNo: 'ААА-1234', deviceId: device2.id }
-  })
+    data: {
+      plateNo: 'UBX-5678',
+      driverName: 'Дорж',
+      driverPhone: '+976-88003344',
+      deviceId: device2.id,
+    },
+  });
 
-  const device3 = await prisma.device.create({ data: { deviceId: 'GPS-0003' } })
-  const vehicle3 = await prisma.vehicle.create({
-    data: { name: 'Truck 3', plateNo: 'БББ-5678', deviceId: device3.id }
-  })
+  console.log('✅ Vehicles created:', { vehicle1, vehicle2 });
 
-  // sample orders with different delivery statuses
+  // Orders
   const order1 = await prisma.order.create({
     data: {
-      code: 'ORDER-991',
+      code: 'DTS-2025-0001',
       companyId: acme.id,
-      origin: 'Улаанбаатар',
-      destination: 'Манжуур',
+      origin: 'Ulaanbaatar',
+      destination: 'Zamyn-Uud',
       vehicleId: vehicle1.id,
-      status: OrderStatus.IN_PROGRESS,
-      deliveryStatus: DeliveryStatus.IN_TRANSIT,
-      createdById: admin.id,
-      assignedToId: operator.id,
-    }
-  })
-
-  const order2 = await prisma.order.create({
-    data: {
-      code: 'ORDER-992',
-      companyId: acme.id,
-      origin: 'Бээжин',
-      destination: 'Дархан',
-      vehicleId: vehicle2.id,
-      status: OrderStatus.IN_PROGRESS,
-      deliveryStatus: DeliveryStatus.MONGOLIA_IMPORT_CUSTOMS,
-      createdById: admin.id,
-      assignedToId: operator.id,
-    }
-  })
-
-  const order3 = await prisma.order.create({
-    data: {
-      code: 'ORDER-993',
-      companyId: acme.id,
-      origin: 'Эрлян',
-      destination: 'Улаангом',
-      vehicleId: vehicle3.id,
       status: OrderStatus.PENDING,
-      deliveryStatus: DeliveryStatus.WAITING,
       createdById: admin.id,
       assignedToId: operator.id,
-    }
-  })
+    },
+  });
 
-  // Add location pings for the vehicles
-  await prisma.locationPing.createMany({
-    data: [
-      { vehicleId: vehicle1.id, lat: 47.9188, lng: 106.9175, speedKph: 60, at: new Date(Date.now() - 5000) },
-      { vehicleId: vehicle2.id, lat: 44.5778, lng: 115.4292, speedKph: 55, at: new Date(Date.now() - 3000) },
-      { vehicleId: vehicle3.id, lat: 49.2000, lng: 105.0000, speedKph: 0, at: new Date(Date.now() - 1000) },
-    ]
-  })
+  await prisma.orderStatusHistory.create({
+    data: {
+      orderId: order1.id,
+      status: order1.status,
+      note: 'Order created',
+    },
+  });
 
-  console.log({ acme, admin, operator, clientAdmin, order1, order2, order3 })
+  console.log('✅ Order created:', { order1 });
+
+  // GPS Pings
+  await prisma.locationPing.create({
+    data: {
+      vehicleId: vehicle1.id,
+      lat: 47.9184,
+      lng: 106.9177,
+      heading: 180,
+    },
+  });
+
+  console.log('✅ GPS ping created');
+  console.log('\n🎉 Seed completed successfully!');
 }
 
-main().finally(() => prisma.$disconnect())
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
 

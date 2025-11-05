@@ -23,7 +23,8 @@ router.get('/latest', async (_req, res) => {
             vehicle: {
               select: {
                 id: true,
-                name: true,
+                driverName: true,
+                driverPhone: true,
                 plateNo: true,
                 device: { select: { deviceId: true } },
               },
@@ -87,7 +88,6 @@ router.post('/ping', async (req, res) => {
         vehicleId: vehicle.id,
         lat,
         lng,
-        speedKph,
       },
     });
 
