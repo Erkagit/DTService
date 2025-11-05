@@ -40,8 +40,10 @@ api.interceptors.response.use(
 // API Methods
 export const authApi = {
   login: (email: string, password: string) => api.post<{
-    token(user: User, token: any): unknown; user: User; message: string 
-}>('/api/auth/login', { email }),
+    user: User;
+    token: string;
+    message: string;
+  }>('/api/auth/login', { email, password }),
 };
 
 export const companiesApi = {
