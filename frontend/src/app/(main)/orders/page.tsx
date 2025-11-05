@@ -5,16 +5,39 @@ import { useRouter } from 'next/navigation';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersApi, vehiclesApi, companiesApi } from '@/services/api';
-import { Truck, Package, Plus, ArrowLeft, MapPin, User, Calendar, X } from 'lucide-react';
+import { Truck, Package, Plus, ArrowLeft, MapPin, User, Calendar, X, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, type OrderStatus } from '@/types/types';
 import { useAuth } from '@/context/AuthProvider';
+import api from '@/services/api';
+
+// Allowed status transitions
+const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  PENDING: ['LOADING', 'CANCELLED'],
+  LOADING: ['IN_TRANSIT', 'TRANSFER_LOADING', 'CANCELLED'],
+  TRANSFER_LOADING: ['IN_TRANSIT', 'CANCELLED'],
+  CN_EXPORT_CUSTOMS: ['IN_TRANSIT', 'CANCELLED'],
+  MN_IMPORT_CUSTOMS: ['IN_TRANSIT', 'CANCELLED'],
+  IN_TRANSIT: ['ARRIVED_AT_SITE', 'TRANSFER_LOADING', 'CANCELLED'],
+  ARRIVED_AT_SITE: ['UNLOADED'],
+  UNLOADED: ['COMPLETED', 'RETURN_TRIP'],
+  RETURN_TRIP: ['MN_EXPORT_RETURN', 'CN_IMPORT_RETURN', 'COMPLETED'],
+  MN_EXPORT_RETURN: ['CN_IMPORT_RETURN', 'COMPLETED'],
+  CN_IMPORT_RETURN: ['COMPLETED'],
+  TRANSFER: ['IN_TRANSIT', 'CANCELLED'],
+  COMPLETED: [],
+  CANCELLED: []
+};
 
 export default function OrdersPage() {
   const { user } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus | ''>('');
+  const [statusNote, setStatusNote] = useState('');
   
   const [formData, setFormData] = useState({
     code: '',
@@ -49,7 +72,7 @@ export default function OrdersPage() {
     enabled: user?.role === 'ADMIN',
   });
 
-  const createOrderMutation = useMutation({
+    const createOrderMutation = useMutation({
     mutationFn: async (data: any) => {
       const payload = {
         code: data.code,
@@ -77,9 +100,54 @@ export default function OrdersPage() {
     },
   });
 
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ orderId, status, note }: { orderId: number; status: OrderStatus; note?: string }) => {
+      return api.patch(`/api/orders/${orderId}/status`, { status, note });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      setShowStatusModal(false);
+      setSelectedOrder(null);
+      setSelectedStatus('');
+      setStatusNote('');
+      alert('✅ Order status updated successfully!');
+    },
+    onError: (error: any) => {
+      alert('❌ ' + (error.response?.data?.error || 'Failed to update status'));
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createOrderMutation.mutate(formData);
+  };
+
+  const handleStatusUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedOrder || !selectedStatus) return;
+    updateStatusMutation.mutate({
+      orderId: selectedOrder.id,
+      status: selectedStatus as OrderStatus,
+      note: statusNote || undefined
+    });
+  };
+
+  const openStatusModal = (order: any) => {
+    setSelectedOrder(order);
+    setShowStatusModal(true);
+  };
+
+  const canUpdateStatus = (order: any) => {
+    // Only ADMIN and OPERATOR can update status
+    if (!user || (user.role !== 'ADMIN' && user.role !== 'OPERATOR')) {
+      return false;
+    }
+    // OPERATOR can only update their assigned orders
+    if (user.role === 'OPERATOR' && order.assignedToId !== user.id) {
+      return false;
+    }
+    // Can't update if already completed or cancelled
+    return order.status !== 'COMPLETED' && order.status !== 'CANCELLED';
   };
 
   if (!user) {
@@ -204,6 +272,85 @@ export default function OrdersPage() {
                 <button type="button" onClick={() => setShowCreateForm(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
                 <button type="submit" disabled={createOrderMutation.isPending} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50">
                   {createOrderMutation.isPending ? 'Creating...' : 'Create Order'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Status Update Modal */}
+      {showStatusModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Update Order Status</h2>
+              <button onClick={() => {
+                setShowStatusModal(false);
+                setSelectedOrder(null);
+                setSelectedStatus('');
+                setStatusNote('');
+              }} className="p-2 hover:bg-gray-100 rounded-lg transition">
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleStatusUpdate} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Order Code</label>
+                <input
+                  type="text"
+                  value={selectedOrder.code}
+                  disabled
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Current Status</label>
+                <input
+                  type="text"
+                  value={selectedOrder.status.replace(/_/g, ' ')}
+                  disabled
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">New Status *</label>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value as OrderStatus | '')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Select new status...</option>
+                  {ALLOWED_TRANSITIONS[selectedOrder.status as OrderStatus]?.map((status) => (
+                    <option key={status} value={status}>
+                      {status.replace(/_/g, ' ')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Note (optional)</label>
+                <textarea
+                  value={statusNote}
+                  onChange={(e) => setStatusNote(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={3}
+                  placeholder="Add any notes about this status change..."
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => {
+                  setShowStatusModal(false);
+                  setSelectedOrder(null);
+                  setSelectedStatus('');
+                  setStatusNote('');
+                }} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                  Cancel
+                </button>
+                <button type="submit" disabled={updateStatusMutation.isPending} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50">
+                  {updateStatusMutation.isPending ? 'Updating...' : 'Update Status'}
                 </button>
               </div>
             </form>
