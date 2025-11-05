@@ -2,10 +2,11 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/AuthProvider';
 import { useQuery } from '@tanstack/react-query';
 import { ordersApi, vehiclesApi } from '@/services/api';
-import { Package, Truck, MapPin, LogOut, Users, Building2 } from 'lucide-react';
+import { Package, Truck, MapPin, LogOut, Users, Building2, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { useAuth } from '@/context/AuthProvider';
 
 export default function DashboardPage() {
   const { user, logout, isLoading: authLoading } = useAuth();
@@ -58,6 +59,7 @@ export default function DashboardPage() {
       icon: Package,
       color: 'bg-blue-500',
       loading: ordersLoading,
+      link: '/orders',
     },
     {
       label: 'Active Vehicles',
@@ -65,6 +67,7 @@ export default function DashboardPage() {
       icon: Truck,
       color: 'bg-green-500',
       loading: vehiclesLoading,
+      link: '/vehicles',
     },
     {
       label: 'In Transit',
@@ -72,6 +75,7 @@ export default function DashboardPage() {
       icon: MapPin,
       color: 'bg-orange-500',
       loading: ordersLoading,
+      link: '/orders',
     },
   ];
 
@@ -111,12 +115,13 @@ export default function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {stats.map((stat) => (
-            <div
+            <Link
               key={stat.label}
-              className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition"
+              href={stat.link}
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition cursor-pointer group"
             >
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-medium text-gray-600 mb-1">{stat.label}</p>
                   {stat.loading ? (
                     <div className="h-9 w-16 bg-gray-200 animate-pulse rounded"></div>
@@ -124,18 +129,28 @@ export default function DashboardPage() {
                     <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
                   )}
                 </div>
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <stat.icon className="w-6 h-6 text-white" />
+                <div>
+                  <div className={`${stat.color} p-3 rounded-lg mb-2`}>
+                    <stat.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition mx-auto" />
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
         {/* Recent Orders */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
+            <Link
+              href="/orders"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+            >
+              View all
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
           <div className="p-6">
             {ordersLoading ? (

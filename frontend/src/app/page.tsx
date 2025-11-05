@@ -1,26 +1,52 @@
-import Link from "next/link";
+'use client';
 
-export default function Home() {
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Truck, Package, MapPin, Clock } from 'lucide-react';
+import { useAuth } from '@/context/AuthProvider';
+
+export default function HomePage() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (user) {
+        router.push('/dashboard');
+      } else {
+        router.push('/login');
+      }
+    }
+  }, [user, isLoading, router]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            Delivery Tracking System
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Welcome to the DTS Monorepo. This is a delivery tracking system for logistics management.
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to from-blue-50 via-white to-indigo-50">
+      <div className="text-center">
+        <div className="flex items-center justify-center mb-8">
+          <Truck className="w-16 h-16 text-blue-600 animate-pulse" />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <Link
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="/deliveries"
-          >
-            Go to Deliveries
-          </Link>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          Delivery Tracking System
+        </h1>
+        <div className="flex items-center justify-center gap-8 mt-12 text-gray-600">
+          <div className="flex flex-col items-center">
+            <Package className="w-8 h-8 mb-2 text-blue-500" />
+            <span className="text-sm">Real-time Tracking</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <MapPin className="w-8 h-8 mb-2 text-green-500" />
+            <span className="text-sm">GPS Monitoring</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <Clock className="w-8 h-8 mb-2 text-orange-500" />
+            <span className="text-sm">Live Updates</span>
+          </div>
         </div>
-      </main>
+        <div className="mt-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
     </div>
   );
 }

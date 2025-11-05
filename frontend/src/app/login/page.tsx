@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/AuthProvider';
+import { useAuth } from '@/context/AuthProvider';
 import { authApi } from '@/services/api';
 import { Truck } from 'lucide-react';
 

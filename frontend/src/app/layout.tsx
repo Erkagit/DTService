@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Providers } from '@/components/Providers';
+import { Providers } from '@/context/Providers';
 
 export const metadata: Metadata = {
   title: 'DTS - Delivery Tracking Service',
