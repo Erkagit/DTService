@@ -21,28 +21,21 @@ enum Role {
 }
 
 enum OrderStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
+ PENDING // Хүлээгдэж байна
+ LOADING // Ачилт хийгдэж байна
+ TRANSFER_LOADING // Шилжүүлэн ачилт
+ CN_EXPORT_CUSTOMS // Хятадын экспорт гааль
+ MN_IMPORT_CUSTOMS // Монгол импорт гааль
+ IN_TRANSIT // Хүргэлт замдаа
+ ARRIVED_AT_SITE // Буулгах хаягт ирсэн
+ UNLOADED // Ачаа буусан
+ RETURN_TRIP // Буцах хүргэлт
+ MN_EXPORT_RETURN // Монголын экспорт (буцах)
+ CN_IMPORT_RETURN // Хятадын импорт (буцах)
+ TRANSFER // Шилжүүлэн ачилт (дундах)
+ COMPLETED // Дуусгах
+ CANCELLED // Цуцлагдсан
 }
-
-enum DeliveryStatus {
-  WAITING                                // Хүлээгдэж байна
-  LOADING                                // Ачилт хийгдэж байна
-  TRANSIT_LOADING_CHINA_EXPORT          // Шилжүүлэн ачилт хийгдэж байна - Хятадын экспорт гааль
-  MONGOLIA_EXPORT_CUSTOMS               // Монгол экспорт гааль
-  MONGOLIA_IMPORT_CUSTOMS               // Монгол импорт гааль
-  IN_TRANSIT                            // Хүргэлт замдаа явж байна
-  ARRIVED_AT_DESTINATION                // Буулгах хаягт ирсэн
-  UNLOADED                              // Ачаа буусан
-  RETURN_DELIVERY                       // Буцах хүргэлт
-  MONGOLIA_EXPORT_RETURN                // Монголын экпорт буцах
-  CHINA_IMPORT                          // Хятадын импорт
-  TRANSIT_LOADING                       // Шилжүүлэн ачилт
-  COMPLETED                             // Дуусгах
-}
-
 
 // Models
 model Company {
@@ -76,35 +69,35 @@ model Device {
 }
 
 model Vehicle {
-  id        Int            @id @default(autoincrement())
-  name      String
-  plateNo   String?        @unique
-  deviceId  Int?
-  device    Device?        @relation(fields: [deviceId], references: [id])
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  orders    Order[]
-  pings     LocationPing[]
+  id          Int             @id @default(autoincrement())
+  plateNo     String          @unique
+  driverName  String
+  driverPhone String
+  deviceId    Int?
+  device      Device?         @relation(fields: [deviceId], references: [id])
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  orders      Order[]
+  pings       LocationPing[]
 }
 
 model Order {
-  id             Int                   @id @default(autoincrement())
-  code           String                @unique
-  companyId      Int
-  company        Company               @relation(fields: [companyId], references: [id])
-  origin         String
-  destination    String
-  vehicleId      Int?
-  vehicle        Vehicle?              @relation(fields: [vehicleId], references: [id])
-  status         OrderStatus           @default(PENDING)
-  deliveryStatus DeliveryStatus        @default(WAITING)
-  createdById    Int
-  createdBy      User                  @relation("CreatedOrders", fields: [createdById], references: [id])
-  assignedToId   Int?
-  assignedTo     User?                 @relation("AssignedOrders", fields: [assignedToId], references: [id])
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  histories      OrderStatusHistory[]
+  id           Int                   @id @default(autoincrement())
+  code         String                @unique
+  companyId    Int
+  company      Company               @relation(fields: [companyId], references: [id])
+  origin       String
+  destination  String
+  vehicleId    Int?
+  vehicle      Vehicle?              @relation(fields: [vehicleId], references: [id])
+  status       OrderStatus           @default(PENDING)
+  createdById  Int
+  createdBy    User                  @relation("CreatedOrders", fields: [createdById], references: [id])
+  assignedToId Int?
+  assignedTo   User?                 @relation("AssignedOrders", fields: [assignedToId], references: [id])
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  histories    OrderStatusHistory[]
 }
 
 model OrderStatusHistory {
@@ -122,7 +115,6 @@ model LocationPing {
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
   lat       Float
   lng       Float
-  speedKph  Float?
   heading   Float?
   at        DateTime @default(now())
 }
