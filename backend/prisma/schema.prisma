@@ -89,7 +89,7 @@ enum OrderStatus {
   MN_EXPORT_RETURN      // Монголын экспорт (буцах)
   CN_IMPORT_RETURN      // Хятадын импорт (буцах)
   TRANSFER              // Шилжүүлэн ачилт (дундах)
-  COMPLETED             // Дуусгах
+  COMPLETED             // Дууссан
   CANCELLED             // Цуцлагдсан
 }
 
