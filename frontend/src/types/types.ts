@@ -221,6 +221,7 @@ export interface OrderCardProps {
   previousStatus: OrderStatus | null;
   nextStatus: OrderStatus | null;
   onQuickUpdate: (order: Order, status: OrderStatus) => void;
+  onDelete?: (order: Order) => void;
 }
 
 export interface CreateOrderModalProps {

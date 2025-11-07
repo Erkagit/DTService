@@ -53,9 +53,10 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
             }}
             variant="ghost"
             icon={Edit2}
-            className="flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
+            fullWidth
+            className="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
           >
-            Edit
+            <span className="hidden sm:inline">Edit</span>
           </Button>
           <Button
             onClick={(e) => {
@@ -64,9 +65,10 @@ export function VehicleCard({ vehicle, onEdit, onDelete }: VehicleCardProps) {
             }}
             variant="ghost"
             icon={Trash2}
-            className="flex-1 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+            fullWidth
+            className="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
           >
-            Delete
+            <span className="hidden sm:inline">Delete</span>
           </Button>
         </div>
       </CardFooter>

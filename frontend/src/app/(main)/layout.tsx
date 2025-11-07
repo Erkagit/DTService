@@ -70,15 +70,18 @@ export default function MainLayout({
         <div className="h-full flex flex-col">
           {/* Logo */}
           <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">Achir Bayron LLC</span>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shrink-0">
+                <span className="text-white font-bold text-xs">AB</span>
               </div>
-              <span className="text-lg font-bold text-gray-900">Tracking</span>
+              <div className="min-w-0">
+                <div className="text-sm font-bold text-gray-900 leading-tight">Achir Bayron</div>
+                <div className="text-xs text-gray-500 leading-tight">Tracking</div>
+              </div>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 shrink-0"
             >
               <X className="w-5 h-5 text-gray-600" />
             </button>
@@ -152,15 +155,18 @@ export default function MainLayout({
         <header className="lg:hidden h-16 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 flex items-center px-4">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100"
+            className="p-2 rounded-lg hover:bg-gray-100 shrink-0"
           >
             <Menu className="w-6 h-6 text-gray-600" />
           </button>
-          <div className="ml-3 flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">DTS</span>
+          <div className="ml-3 flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shrink-0">
+              <span className="text-white font-bold text-xs">AB</span>
             </div>
-            <span className="text-lg font-bold text-gray-900">Tracking</span>
+            <div className="min-w-0">
+              <div className="text-sm font-bold text-gray-900 leading-tight truncate">Achir Bayron</div>
+              <div className="text-xs text-gray-500 leading-tight">Tracking</div>
+            </div>
           </div>
         </header>
 

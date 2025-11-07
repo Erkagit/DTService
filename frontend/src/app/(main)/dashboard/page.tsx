@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { ordersApi, vehiclesApi, companiesApi } from '@/services/api';
-import { Package, Truck, MapPin, Building2, ArrowRight } from 'lucide-react';
+import { Package, Truck, Building2, ArrowRight, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthProvider';
 import { PageHeader, StatCard, EmptyState } from '@/components/ui';
@@ -17,11 +17,17 @@ export default function DashboardPage() {
     queryKey: ['orders'],
     queryFn: async () => {
       const res = await ordersApi.getAll();
+      let filteredOrders = res.data;
+      
       // Filter orders for CLIENT_ADMIN
       if (user?.role === 'CLIENT_ADMIN' && user.companyId) {
-        return res.data.filter((o: any) => o.companyId === user.companyId);
+        filteredOrders = filteredOrders.filter((o: any) => o.companyId === user.companyId);
       }
-      return res.data;
+      
+      // Sort by createdAt descending (newest first)
+      return filteredOrders.sort((a: any, b: any) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     },
     enabled: !!user,
   });
@@ -85,15 +91,6 @@ export default function DashboardPage() {
       link: '/vehicles',
       description: 'Fleet in operation',
     }] : []),
-    {
-      label: 'In Transit',
-      value: orders?.filter((o) => o.status === 'IN_TRANSIT').length || 0,
-      icon: MapPin,
-      color: 'bg-orange-500',
-      loading: ordersLoading,
-      link: '/orders',
-      description: 'Currently on delivery',
-    },
   ];
 
   // Add Companies card for Admin users

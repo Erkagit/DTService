@@ -94,7 +94,7 @@ export default function UsersPage() {
     setShowEditModal(true);
   };
 
-  const handleUpdateUser = async (e: React.FormEvent) => {
+  const handleUpdateUser = async (e: React.FormEvent, passwordData?: { newPassword: string }) => {
     e.preventDefault();
     if (!editingUser) return;
     
@@ -103,15 +103,22 @@ export default function UsersPage() {
     setSubmitting(true);
 
     try {
-      const userData = {
+      const userData: any = {
         email: editFormData.email,
         name: editFormData.name,
         role: editFormData.role,
         companyId: editFormData.companyId ? parseInt(editFormData.companyId) : null
       };
 
+      // Add password if provided
+      if (passwordData?.newPassword) {
+        userData.password = passwordData.newPassword;
+      }
+
       await api.put(`/api/users/${editingUser.id}`, userData);
-      setSuccess('User updated successfully!');
+      setSuccess(passwordData?.newPassword 
+        ? 'User and password updated successfully!' 
+        : 'User updated successfully!');
       setShowEditModal(false);
       setEditingUser(null);
       setEditFormData({ email: '', name: '', role: 'CLIENT_ADMIN', companyId: '' });

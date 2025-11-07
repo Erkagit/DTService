@@ -66,12 +66,17 @@ export default function CompanyDetailPage() {
   const users = company.users || [];
   const orders = company.orders || [];
 
+  // Sort orders by createdAt descending (newest first)
+  const sortedOrders = [...orders].sort((a: any, b: any) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
   // Separate active and completed orders
-  const activeOrders = orders.filter(order => 
+  const activeOrders = sortedOrders.filter(order => 
     order.status !== 'COMPLETED' && order.status !== 'CANCELLED'
   );
   
-  const completedOrders = orders.filter(order => 
+  const completedOrders = sortedOrders.filter(order => 
     order.status === 'COMPLETED' || order.status === 'CANCELLED'
   );
 
@@ -167,9 +172,9 @@ export default function CompanyDetailPage() {
         </div>
 
         {/* Users Section */}
-        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Users className="w-6 h-6 text-purple-600" />
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
             Users
           </h3>
           {users.length > 0 ? (
@@ -179,12 +184,12 @@ export default function CompanyDetailPage() {
                   key={user.id}
                   className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:bg-gray-100 transition-colors"
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <UserIcon className="w-4 h-4 text-gray-400" />
-                      <p className="font-medium text-gray-900">{user.name}</p>
+                  <div className="flex items-start justify-between mb-2 gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <UserIcon className="w-4 h-4 text-gray-400 shrink-0" />
+                      <p className="font-medium text-gray-900 truncate">{user.name}</p>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
+                    <span className={`text-xs px-2 py-1 rounded-full shrink-0 ${
                       user.role === 'ADMIN' 
                         ? 'bg-red-100 text-red-700' 
                         : 'bg-blue-100 text-blue-700'
@@ -192,12 +197,12 @@ export default function CompanyDetailPage() {
                       {user.role === 'CLIENT_ADMIN' ? 'Client Admin' : user.role}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    <Mail className="w-3 h-3" />
-                    <span>{user.email}</span>
+                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1 min-w-0">
+                    <Mail className="w-3 h-3 shrink-0" />
+                    <span className="truncate">{user.email}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Calendar className="w-3 h-3" />
+                    <Calendar className="w-3 h-3 shrink-0" />
                     <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
@@ -213,10 +218,10 @@ export default function CompanyDetailPage() {
 
         {/* Active Orders Section */}
         <section>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Active Orders</h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Active Orders</h2>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
                 {activeOrders.length} order{activeOrders.length !== 1 ? 's' : ''} in progress
               </p>
             </div>
@@ -232,6 +237,7 @@ export default function CompanyDetailPage() {
                   previousStatus={getPreviousStatus(order.status as OrderStatus)}
                   nextStatus={getNextStatus(order.status as OrderStatus)}
                   onQuickUpdate={handleQuickStatusUpdate}
+                  onDelete={undefined}
                 />
               ))}
             </div>
@@ -245,10 +251,10 @@ export default function CompanyDetailPage() {
 
         {/* Completed Orders Section */}
         <section>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Completed Orders</h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Completed Orders</h2>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
                 {completedOrders.length} order{completedOrders.length !== 1 ? 's' : ''} finished
               </p>
             </div>
@@ -272,6 +278,7 @@ export default function CompanyDetailPage() {
                   previousStatus={null}
                   nextStatus={null}
                   onQuickUpdate={handleQuickStatusUpdate}
+                  onDelete={undefined}
                 />
               ))}
             </div>

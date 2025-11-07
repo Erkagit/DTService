@@ -1,5 +1,5 @@
-import { MapPin, Truck, User, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Card, CardHeader } from '@/components/ui/Card';
+import { MapPin, Truck, User, Calendar, ChevronLeft, ChevronRight, Trash2, Building2 } from 'lucide-react';
+import { Card, CardHeader, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, type OrderStatus } from '@/types/types';
 import type { OrderCardProps } from '@/types/types';
@@ -10,14 +10,15 @@ export function OrderCard({
   previousStatus,
   nextStatus,
   onQuickUpdate,
+  onDelete,
 }: OrderCardProps) {
   return (
     <Card hover>
       <CardHeader>
-        <div className="flex justify-between items-start mb-4">
-          <h3 className="text-lg font-bold text-gray-900">{order.code}</h3>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
+          <h3 className="text-lg font-bold text-gray-900 break-all">{order.code}</h3>
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${
+            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap self-start ${
               ORDER_STATUS_COLORS[order.status as OrderStatus]
             }`}
           >
@@ -26,6 +27,13 @@ export function OrderCard({
         </div>
 
         <div className="space-y-3">
+          {order.company && (
+            <div className="flex items-center gap-2 text-sm bg-purple-50 px-3 py-2 rounded-lg">
+              <Building2 className="w-4 h-4 text-purple-600" />
+              <span className="text-purple-900 font-medium">{order.company.name}</span>
+            </div>
+          )}
+
           <div className="flex items-start gap-2 text-sm">
             <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
             <div>
@@ -64,7 +72,7 @@ export function OrderCard({
           </div>
 
           {canUpdate && (previousStatus || nextStatus) && (
-            <div className="flex gap-2 mt-3">
+            <div className="flex flex-col sm:flex-row gap-2 mt-3">
               {previousStatus && (
                 <Button
                   onClick={() => onQuickUpdate(order, previousStatus)}
@@ -74,7 +82,7 @@ export function OrderCard({
                   className="text-sm"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Prev
+                  <span className="hidden sm:inline">Prev</span>
                 </Button>
               )}
               {nextStatus && (
@@ -84,7 +92,7 @@ export function OrderCard({
                   fullWidth
                   className="text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
                 >
-                  Next
+                  <span className="hidden sm:inline">Next</span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               )}
@@ -92,6 +100,21 @@ export function OrderCard({
           )}
         </div>
       </CardHeader>
+
+      {canUpdate && onDelete && (
+        <CardFooter className="pt-3 border-t border-gray-100">
+          <Button
+            onClick={() => onDelete(order)}
+            variant="ghost"
+            size="sm"
+            icon={Trash2}
+            fullWidth
+            className="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+          >
+            Delete Order
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }

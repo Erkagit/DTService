@@ -44,7 +44,7 @@ export function CompanyCard({ company, onAddUser, onViewDetails, onEdit, onDelet
       </CardHeader>
 
       <CardFooter className="pt-4 border-t border-gray-100">
-        <div className="flex gap-2 w-full">
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
           <Button
             onClick={(e) => {
               e.stopPropagation();
@@ -52,34 +52,38 @@ export function CompanyCard({ company, onAddUser, onViewDetails, onEdit, onDelet
             }}
             variant="ghost"
             icon={UserPlus}
-            className="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-200"
+            fullWidth
+            className="bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-200"
           >
-            Add Client Admin
+            <span className="hidden sm:inline">Add Client Admin</span>
+            <span className="sm:hidden">Add Admin</span>
           </Button>
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(company);
-            }}
-            variant="ghost"
-            size="md"
-            icon={Edit2}
-            className="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
-          >
-            Edit
-          </Button>
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(company);
-            }}
-            variant="ghost"
-            size="md"
-            icon={Trash2}
-            className="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
-          >
-            Delete
-          </Button>
+          <div className="flex gap-2 sm:flex-none">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(company);
+              }}
+              variant="ghost"
+              size="md"
+              icon={Edit2}
+              className="flex-1 sm:flex-none bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
+            >
+              <span className="hidden sm:inline">Edit</span>
+            </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(company);
+              }}
+              variant="ghost"
+              size="md"
+              icon={Trash2}
+              className="flex-1 sm:flex-none bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+            >
+              <span className="hidden sm:inline">Delete</span>
+            </Button>
+          </div>
         </div>
       </CardFooter>
     </Card>

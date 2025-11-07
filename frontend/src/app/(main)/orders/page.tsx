@@ -54,11 +54,17 @@ export default function OrdersPage() {
     queryKey: ['orders'],
     queryFn: async () => {
       const res = await ordersApi.getAll();
+      let filteredOrders = res.data;
+      
       // Filter orders for CLIENT_ADMIN - only show their company's orders
       if (user?.role === 'CLIENT_ADMIN' && user.companyId) {
-        return res.data.filter((order: any) => order.companyId === user.companyId);
+        filteredOrders = filteredOrders.filter((order: any) => order.companyId === user.companyId);
       }
-      return res.data;
+      
+      // Sort by createdAt descending (newest first)
+      return filteredOrders.sort((a: any, b: any) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     },
   });
 
@@ -113,12 +119,50 @@ export default function OrdersPage() {
     mutationFn: async ({ orderId, status, note }: { orderId: number; status: OrderStatus; note?: string }) => {
       return api.patch(`/api/orders/${orderId}/status`, { status, note });
     },
+    onMutate: async ({ orderId, status }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['orders'] });
+      
+      // Snapshot the previous value
+      const previousOrders = queryClient.getQueryData(['orders']);
+      
+      // Optimistically update to the new value (update status but keep position)
+      queryClient.setQueryData(['orders'], (old: any) => {
+        if (!old) return old;
+        return old.map((order: any) => 
+          order.id === orderId 
+            ? { ...order, status }
+            : order
+        );
+      });
+      
+      // Return context with the previous orders
+      return { previousOrders };
+    },
+    onError: (error: any, variables, context) => {
+      // Rollback on error
+      if (context?.previousOrders) {
+        queryClient.setQueryData(['orders'], context.previousOrders);
+      }
+      alert('❌ ' + (error.response?.data?.error || 'Failed to update status'));
+    },
     onSuccess: () => {
+      // Refetch to get the latest data from server
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       handleCloseStatusModal();
     },
+  });
+
+  const deleteOrderMutation = useMutation({
+    mutationFn: async (orderId: number) => {
+      return ordersApi.delete(orderId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      alert('✅ Order deleted successfully!');
+    },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to update status'));
+      alert('❌ ' + (error.response?.data?.error || 'Failed to delete order'));
     },
   });
 
@@ -200,6 +244,12 @@ export default function OrdersPage() {
         status: newStatus,
         note: undefined
       });
+    }
+  };
+
+  const handleDeleteOrder = (order: any) => {
+    if (confirm(`Are you sure you want to delete order "${order.code}"? This action cannot be undone.`)) {
+      deleteOrderMutation.mutate(order.id);
     }
   };
 
@@ -289,6 +339,7 @@ export default function OrdersPage() {
                       previousStatus={getPreviousStatus(order.status as OrderStatus)}
                       nextStatus={getNextStatus(order.status as OrderStatus)}
                       onQuickUpdate={handleQuickStatusUpdate}
+                      onDelete={user?.role === 'ADMIN' ? handleDeleteOrder : undefined}
                     />
                   ))}
                 </div>
@@ -329,6 +380,7 @@ export default function OrdersPage() {
                       previousStatus={null}
                       nextStatus={null}
                       onQuickUpdate={handleQuickStatusUpdate}
+                      onDelete={user?.role === 'ADMIN' ? handleDeleteOrder : undefined}
                     />
                   ))}
                 </div>
