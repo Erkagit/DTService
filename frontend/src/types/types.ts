@@ -3,7 +3,7 @@ export interface User {
   id: number;
   email: string;
   name: string;
-  role: 'ADMIN' | 'OPERATOR' | 'CLIENT_ADMIN';
+  role: 'ADMIN' | 'CLIENT_ADMIN';
   companyId: number | null;
   company?: Company;
 }
@@ -14,7 +14,7 @@ export interface Company {
   createdAt: string;
   updatedAt: string;
   _count?: {
-    users: User[];
+    users: number;
     orders: number;
   };
 }

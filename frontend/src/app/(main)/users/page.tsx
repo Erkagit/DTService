@@ -30,7 +30,7 @@ export default function UsersPage() {
     email: '',
     name: '',
     password: '',
-    role: 'OPERATOR',
+    role: 'CLIENT_ADMIN',
     companyId: ''
   });
   const [error, setError] = useState('');
@@ -76,7 +76,7 @@ export default function UsersPage() {
       await api.post('/api/users', userData);
       setSuccess('User created successfully!');
       setShowCreateModal(false);
-      setFormData({ email: '', name: '', password: '', role: 'OPERATOR', companyId: '' });
+      setFormData({ email: '', name: '', password: '', role: 'CLIENT_ADMIN', companyId: '' });
       fetchUsers();
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to create user');
@@ -154,7 +154,6 @@ export default function UsersPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                      user.role === 'OPERATOR' ? 'bg-blue-100 text-blue-800' :
                       'bg-green-100 text-green-800'
                     }`}>
                       {user.role}
@@ -230,7 +229,6 @@ export default function UsersPage() {
                   required
                 >
                   <option value="ADMIN">Admin</option>
-                  <option value="OPERATOR">Operator</option>
                   <option value="CLIENT_ADMIN">Client Admin</option>
                 </select>
               </div>
@@ -261,7 +259,7 @@ export default function UsersPage() {
                   type="button"
                   onClick={() => {
                     setShowCreateModal(false);
-                    setFormData({ email: '', name: '', password: '', role: 'OPERATOR', companyId: '' });
+                    setFormData({ email: '', name: '', password: '', role: 'CLIENT_ADMIN', companyId: '' });
                     setError('');
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"

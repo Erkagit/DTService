@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { companiesApi } from '@/services/api';
 import api from '@/services/api';
-import { Building2, ArrowLeft, Plus, X, Users, Package } from 'lucide-react';
-import Link from 'next/link';
+import { Building2, Plus, X, Users as UsersIcon, Package, UserPlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 
 export default function CompaniesPage() {
@@ -14,9 +13,17 @@ export default function CompaniesPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState<any>(null);
   
   const [formData, setFormData] = useState({
     name: '',
+  });
+
+  const [userFormData, setUserFormData] = useState({
+    email: '',
+    name: '',
+    password: '',
   });
 
   const { data: companies, isLoading } = useQuery({
@@ -42,9 +49,41 @@ export default function CompaniesPage() {
     },
   });
 
+  const createUserMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return api.post('/api/users', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      setShowCreateUserModal(false);
+      setSelectedCompany(null);
+      setUserFormData({ email: '', name: '', password: '' });
+      alert('✅ Client Admin user created successfully!');
+    },
+    onError: (error: any) => {
+      alert('❌ ' + (error.response?.data?.error || 'Failed to create user'));
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createCompanyMutation.mutate(formData);
+  };
+
+  const handleUserSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCompany) return;
+    
+    createUserMutation.mutate({
+      ...userFormData,
+      role: 'CLIENT_ADMIN',
+      companyId: selectedCompany.id
+    });
+  };
+
+  const openCreateUserModal = (company: any) => {
+    setSelectedCompany(company);
+    setShowCreateUserModal(true);
   };
 
   if (!user) {
@@ -58,9 +97,6 @@ export default function CompaniesPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
           <p className="text-gray-600 mb-4">Admin access required</p>
-          <Link href="/dashboard" className="text-blue-600 hover:underline">
-            Back to Dashboard
-          </Link>
         </div>
       </div>
     );
@@ -72,14 +108,9 @@ export default function CompaniesPage() {
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition">
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </Link>
-              <div className="flex items-center gap-3">
-                <Building2 className="w-8 h-8 text-purple-600" />
-                <h1 className="text-2xl font-bold text-gray-900">Companies</h1>
-              </div>
+            <div className="flex items-center gap-3">
+              <Building2 className="w-8 h-8 text-purple-600" />
+              <h1 className="text-2xl font-bold text-gray-900">Companies</h1>
             </div>
             <button
               onClick={() => setShowCreateForm(true)}
@@ -142,6 +173,94 @@ export default function CompaniesPage() {
         </div>
       )}
 
+      {/* Create User Modal */}
+      {showCreateUserModal && selectedCompany && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-900">Create Client Admin for {selectedCompany.name}</h2>
+              <button
+                onClick={() => {
+                  setShowCreateUserModal(false);
+                  setSelectedCompany(null);
+                  setUserFormData({ email: '', name: '', password: '' });
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleUserSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  value={userFormData.name}
+                  onChange={(e) => setUserFormData({ ...userFormData, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="John Doe"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={userFormData.email}
+                  onChange={(e) => setUserFormData({ ...userFormData, email: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="john@company.com"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  value={userFormData.password}
+                  onChange={(e) => setUserFormData({ ...userFormData, password: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                />
+                <p className="mt-1 text-xs text-gray-500">Minimum 6 characters</p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateUserModal(false);
+                    setSelectedCompany(null);
+                    setUserFormData({ email: '', name: '', password: '' });
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createUserMutation.isPending}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:opacity-50"
+                >
+                  {createUserMutation.isPending ? 'Creating...' : 'Create User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isLoading ? (
@@ -164,8 +283,8 @@ export default function CompaniesPage() {
                       {company._count && (
                         <>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Users className="w-4 h-4 text-gray-400" />
-                            <span>{company._count.users} Users</span>
+                            <UsersIcon className="w-4 h-4 text-gray-400" />
+                            <span>{company._count.users} {`Users`}</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Package className="w-4 h-4 text-gray-400" />
@@ -178,6 +297,16 @@ export default function CompaniesPage() {
                   <div className="p-3 bg-purple-100 rounded-lg">
                     <Building2 className="w-6 h-6 text-purple-600" />
                   </div>
+                </div>
+                
+                <div className="pt-4 border-t border-gray-100">
+                  <button
+                    onClick={() => openCreateUserModal(company)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition border border-purple-200"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span className="text-sm font-medium">Add Client Admin</span>
+                  </button>
                 </div>
               </div>
             ))}

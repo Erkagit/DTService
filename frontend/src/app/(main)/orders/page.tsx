@@ -5,27 +5,25 @@ import { useRouter } from 'next/navigation';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersApi, vehiclesApi, companiesApi } from '@/services/api';
-import { Truck, Package, Plus, ArrowLeft, MapPin, User, Calendar, X, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
+import { Truck, Package, Plus, MapPin, User, Calendar, X, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, type OrderStatus } from '@/types/types';
 import { useAuth } from '@/context/AuthProvider';
 import api from '@/services/api';
-import { CANCELLED } from 'dns';
 
-// Allowed status transitions
+// Allowed status transitions - Sequential workflow with cancel option at each step
 const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  PENDING: ['PENDING', 'CANCELLED'],
-  LOADING: ['LOADING', 'CANCELLED'],
-  TRANSFER_LOADING: ['TRANSFER_LOADING', 'CANCELLED'],
-  CN_EXPORT_CUSTOMS: ['CN_EXPORT_CUSTOMS', 'CANCELLED'],
-  MN_IMPORT_CUSTOMS: ['MN_IMPORT_CUSTOMS', 'CANCELLED'],
-  IN_TRANSIT: ['IN_TRANSIT', 'CANCELLED'],
-  ARRIVED_AT_SITE: ['ARRIVED_AT_SITE', 'CANCELLED'],
-  UNLOADED: ['UNLOADED', 'CANCELLED'],
-  RETURN_TRIP: ['RETURN_TRIP', 'COMPLETED'],
-  MN_EXPORT_RETURN: ['CN_IMPORT_RETURN', 'COMPLETED'],
-  CN_IMPORT_RETURN: ['COMPLETED'],
-  TRANSFER: ['IN_TRANSIT', 'CANCELLED'],
+  PENDING: ['LOADING', 'CANCELLED'],
+  LOADING: ['TRANSFER_LOADING', 'CANCELLED'],
+  TRANSFER_LOADING: ['CN_EXPORT_CUSTOMS', 'CANCELLED'],
+  CN_EXPORT_CUSTOMS: ['MN_IMPORT_CUSTOMS', 'CANCELLED'],
+  MN_IMPORT_CUSTOMS: ['IN_TRANSIT', 'CANCELLED'],
+  IN_TRANSIT: ['ARRIVED_AT_SITE', 'CANCELLED'],
+  ARRIVED_AT_SITE: ['UNLOADED', 'CANCELLED'],
+  UNLOADED: ['RETURN_TRIP', 'CANCELLED'],
+  RETURN_TRIP: ['MN_EXPORT_RETURN', 'CANCELLED'],
+  MN_EXPORT_RETURN: ['CN_IMPORT_RETURN', 'CANCELLED'],
+  CN_IMPORT_RETURN: ['TRANSFER', 'CANCELLED'],
+  TRANSFER: ['COMPLETED', 'CANCELLED'],
   COMPLETED: [],
   CANCELLED: []
 };
@@ -75,12 +73,21 @@ export default function OrdersPage() {
 
     const createOrderMutation = useMutation({
     mutationFn: async (data: any) => {
+      // For non-admin users with a companyId, use their company
+      // For admin users, require company selection
+      const finalCompanyId = user?.companyId || data.companyId;
+      
+      if (!finalCompanyId) {
+        throw new Error('Company is required');
+      }
+
       const payload = {
         code: data.code,
         origin: data.origin,
         destination: data.destination,
         vehicleId: data.vehicleId ? parseInt(data.vehicleId) : undefined,
-        companyId: data.companyId ? parseInt(data.companyId) : undefined,
+        companyId: parseInt(finalCompanyId),
+        createdById: user?.id,
       };
       return ordersApi.create(payload);
     },
@@ -111,7 +118,6 @@ export default function OrdersPage() {
       setSelectedOrder(null);
       setSelectedStatus('');
       setStatusNote('');
-      alert('✅ Order status updated successfully!');
     },
     onError: (error: any) => {
       alert('❌ ' + (error.response?.data?.error || 'Failed to update status'));
@@ -139,12 +145,8 @@ export default function OrdersPage() {
   };
 
   const canUpdateStatus = (order: any) => {
-    // Only ADMIN and OPERATOR can update status
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'OPERATOR')) {
-      return false;
-    }
-    // OPERATOR can only update their assigned orders
-    if (user.role === 'OPERATOR' && order.assignedToId !== user.id) {
+    // Only ADMIN can update status
+    if (!user || user.role !== 'ADMIN') {
       return false;
     }
     // Can't update if already completed or cancelled
@@ -152,20 +154,55 @@ export default function OrdersPage() {
   };
 
   const getPreviousStatus = (currentStatus: OrderStatus): OrderStatus | null => {
-    // Find which status has currentStatus in its allowed transitions
-    const entries = Object.entries(ALLOWED_TRANSITIONS) as [OrderStatus, OrderStatus[]][];
-    for (const [prevStatus, allowedNext] of entries) {
-      if (allowedNext.includes(currentStatus)) {
-        return prevStatus;
-      }
-    }
-    return null;
+    // Define the sequential order of statuses
+    const statusOrder: OrderStatus[] = [
+      'PENDING',
+      'LOADING', 
+      'TRANSFER_LOADING',
+      'CN_EXPORT_CUSTOMS',
+      'MN_IMPORT_CUSTOMS',
+      'IN_TRANSIT',
+      'ARRIVED_AT_SITE',
+      'UNLOADED',
+      'RETURN_TRIP',
+      'MN_EXPORT_RETURN',
+      'CN_IMPORT_RETURN',
+      'TRANSFER',
+      'COMPLETED'
+    ];
+    
+    const currentIndex = statusOrder.indexOf(currentStatus);
+    
+    // If not found or at the beginning, no previous status
+    if (currentIndex <= 0) return null;
+    
+    return statusOrder[currentIndex - 1];
   };
 
   const getNextStatus = (currentStatus: OrderStatus): OrderStatus | null => {
-    const allowedNext = ALLOWED_TRANSITIONS[currentStatus];
-    // Return the first allowed next status (primary progression path)
-    return allowedNext && allowedNext.length > 0 ? allowedNext[0] : null;
+    // Define the sequential order of statuses
+    const statusOrder: OrderStatus[] = [
+      'PENDING',
+      'LOADING',
+      'TRANSFER_LOADING',
+      'CN_EXPORT_CUSTOMS',
+      'MN_IMPORT_CUSTOMS',
+      'IN_TRANSIT',
+      'ARRIVED_AT_SITE',
+      'UNLOADED',
+      'RETURN_TRIP',
+      'MN_EXPORT_RETURN',
+      'CN_IMPORT_RETURN',
+      'TRANSFER',
+      'COMPLETED'
+    ];
+    
+    const currentIndex = statusOrder.indexOf(currentStatus);
+    
+    // If not found or at the end, no next status
+    if (currentIndex === -1 || currentIndex >= statusOrder.length - 1) return null;
+    
+    return statusOrder[currentIndex + 1];
   };
 
   const handleQuickStatusUpdate = (order: any, newStatus: OrderStatus) => {
@@ -195,16 +232,11 @@ export default function OrdersPage() {
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition">
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </Link>
-              <div className="flex items-center gap-3">
-                <Package className="w-8 h-8 text-blue-600" />
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-                  <p className="text-sm text-gray-500">Delivery order management</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <Package className="w-8 h-8 text-blue-600" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+                <p className="text-sm text-gray-500">Delivery order management</p>
               </div>
             </div>
             <button

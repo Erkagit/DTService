@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { ordersApi, vehiclesApi, companiesApi } from '@/services/api';
-import { Package, Truck, MapPin, LogOut, Users, Building2, ArrowRight } from 'lucide-react';
+import { Package, Truck, MapPin, Building2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthProvider';
 
@@ -109,32 +109,13 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Truck className="w-8 h-8 text-blue-600" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">DTS Dashboard</h1>
-                <p className="text-sm text-gray-500">Delivery Tracking System</p>
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Truck className="w-8 h-8 text-blue-600" />
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                <div className="flex items-center justify-end gap-2 text-xs text-gray-500">
-                  {user.role === 'ADMIN' && <Users className="w-3 h-3" />}
-                  {user.companyId && <Building2 className="w-3 h-3" />}
-                  <span className="bg-gray-100 px-2 py-0.5 rounded">{user.role}</span>
-                </div>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
-                title="Logout"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm text-gray-500">Delivery Tracking System Overview</p>
             </div>
           </div>
         </div>
@@ -173,38 +154,6 @@ export default function DashboardPage() {
               </Link>
             ))}
           </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Link
-            href="/orders"
-            className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-sm hover:shadow-md transition"
-          >
-            <Package className="w-8 h-8 mb-3" />
-            <h3 className="text-lg font-bold mb-1">Manage Orders</h3>
-            <p className="text-sm text-blue-100">Create and track delivery orders</p>
-          </Link>
-          
-          <Link
-            href="/vehicles"
-            className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-sm hover:shadow-md transition"
-          >
-            <Truck className="w-8 h-8 mb-3" />
-            <h3 className="text-lg font-bold mb-1">Fleet Management</h3>
-            <p className="text-sm text-green-100">Monitor vehicles and drivers</p>
-          </Link>
-          
-          {user.role === 'ADMIN' && (
-            <Link
-              href="/companies"
-              className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-sm hover:shadow-md transition"
-            >
-              <Building2 className="w-8 h-8 mb-3" />
-              <h3 className="text-lg font-bold mb-1">Companies</h3>
-              <p className="text-sm text-purple-100">Manage logistics companies</p>
-            </Link>
-          )}
         </div>
 
         {/* Recent Orders */}

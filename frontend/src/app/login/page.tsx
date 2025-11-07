@@ -141,12 +141,7 @@ login(response.data.user, response.data.token);  // ✅ token дамжуулах
                 <p className="text-gray-600">Password: <code className="bg-gray-100 px-1 py-0.5 rounded">password123</code></p>
               </div>
               <div className="bg-white rounded p-2">
-                <p className="font-medium text-gray-900">Operator</p>
-                <p className="text-gray-600">Email: <code className="bg-gray-100 px-1 py-0.5 rounded">op@dts.local</code></p>
-                <p className="text-gray-600">Password: <code className="bg-gray-100 px-1 py-0.5 rounded">password123</code></p>
-              </div>
-              <div className="bg-white rounded p-2">
-                <p className="font-medium text-gray-900">Client</p>
+                <p className="font-medium text-gray-900">Client Admin</p>
                 <p className="text-gray-600">Email: <code className="bg-gray-100 px-1 py-0.5 rounded">client@acme.local</code></p>
                 <p className="text-gray-600">Password: <code className="bg-gray-100 px-1 py-0.5 rounded">password123</code></p>
               </div>
