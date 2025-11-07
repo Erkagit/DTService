@@ -32,7 +32,6 @@ model User {
 
 enum Role {
   ADMIN
-  OPERATOR
   CLIENT_ADMIN
 }
 

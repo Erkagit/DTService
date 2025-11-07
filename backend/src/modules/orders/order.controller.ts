@@ -88,9 +88,6 @@ export async function updateStatus(req: Request, res: Response) {
     if (user.role === Role.CLIENT_ADMIN) {
       return res.status(403).json({ error: 'Forbidden' });
     }
-    if (user.role === Role.OPERATOR && order.assignedToId !== user.id) {
-      return res.status(403).json({ error: 'Forbidden: not assigned' });
-    }
 
     const allowed = ALLOWED[order.status] || [];
     if (!allowed.includes(status)) {
