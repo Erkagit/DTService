@@ -1,6 +1,6 @@
 import { Order, OrderStatus } from '@/types/types';
 import { OrderCard } from './OrderCard';
-import { useOrderStatusTransitions } from '@/hooks/useOrderStatusTransitions';
+import { getPreviousStatus, getNextStatus } from '@/utils/orderStatusFlow';
 
 interface OrderListProps {
   orders: Order[];
@@ -32,17 +32,16 @@ export function OrderList({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {orders.map((order) => {
-        const { getPrevious, getNext } = useOrderStatusTransitions(
-          order.status as OrderStatus
-        );
+        const previousStatus = getPreviousStatus(order.status as OrderStatus);
+        const nextStatus = getNextStatus(order.status as OrderStatus);
         
         return (
           <OrderCard
             key={order.id}
             order={order}
             canUpdateStatus={canUpdateStatus(order)}
-            previousStatus={getPrevious()}
-            nextStatus={getNext()}
+            previousStatus={previousStatus}
+            nextStatus={nextStatus}
             onStatusUpdate={(newStatus) => onStatusUpdate(order.id, newStatus)}
           />
         );

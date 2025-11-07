@@ -29,13 +29,15 @@ export function useOrders() {
   });
 
   // Query for fetching companies (for admins)
+  // NOTE: This query is disabled by default. It should be enabled
+  // by the consuming component based on user role (e.g., enabled: user?.role === 'ADMIN')
   const companiesQuery = useQuery({
     queryKey: ['companies'],
     queryFn: async () => {
       const res = await companiesApi.getAll();
       return res.data;
     },
-    enabled: false, // Will be enabled based on user role
+    enabled: false,
   });
 
   // Mutation for creating a new order
@@ -93,7 +95,8 @@ export function useOrders() {
     updateStatus: updateStatusMutation.mutate,
     isUpdatingStatus: updateStatusMutation.isPending,
     
-    // Mutation objects (for more control)
+    // Mutation objects - provide access to mutation states and additional methods
+    // Use these when you need: isLoading, isError, error details, reset(), etc.
     createOrderMutation,
     updateStatusMutation,
   };

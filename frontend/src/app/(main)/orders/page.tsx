@@ -136,7 +136,7 @@ export default function OrdersPage() {
         onSubmit={handleCreateSubmit}
         isSubmitting={createOrderMutation.isPending}
         userRole={user.role}
-        defaultCompanyId={user.companyId || ''}
+        defaultCompanyId={user.companyId ?? undefined}
         vehicles={vehicles}
         companies={companies}
         initialOrderCode={generateOrderCode()}
