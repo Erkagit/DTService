@@ -60,6 +60,110 @@ router.post('/', async (req, res) => {
   }
 });
 
+// PUT /api/vehicles/:id
+router.put('/:id', async (req, res) => {
+  try {
+    const vehicleId = parseInt(req.params.id);
+    const { plateNo, driverName, driverPhone, deviceId } = req.body;
+
+    if (isNaN(vehicleId)) {
+      return res.status(400).json({ error: 'Invalid vehicle ID' });
+    }
+
+    // Check if vehicle exists
+    const existingVehicle = await prisma.vehicle.findUnique({
+      where: { id: vehicleId },
+    });
+
+    if (!existingVehicle) {
+      return res.status(404).json({ error: 'Vehicle not found' });
+    }
+
+    // Check if device exists
+    if (deviceId !== undefined && deviceId !== null && deviceId !== '') {
+      const device = await prisma.device.findUnique({
+        where: { id: parseInt(deviceId) },
+      });
+      if (!device) {
+        return res.status(404).json({ error: 'Device not found' });
+      }
+    }
+
+    const vehicle = await prisma.vehicle.update({
+      where: { id: vehicleId },
+      data: {
+        ...(plateNo && { plateNo }),
+        ...(driverName && { driverName }),
+        ...(driverPhone && { driverPhone }),
+        ...(deviceId !== undefined && { 
+          deviceId: deviceId ? parseInt(deviceId) : null 
+        }),
+      },
+      include: {
+        device: true,
+      },
+    });
+
+    res.json(vehicle);
+  } catch (error) {
+    console.error('Error updating vehicle:', error);
+    res.status(500).json({ error: 'Failed to update vehicle' });
+  }
+});
+
+// DELETE /api/vehicles/:id
+router.delete('/:id', async (req, res) => {
+  try {
+    const vehicleId = parseInt(req.params.id);
+
+    if (isNaN(vehicleId)) {
+      return res.status(400).json({ error: 'Invalid vehicle ID' });
+    }
+
+    // Check if vehicle exists
+    const existingVehicle = await prisma.vehicle.findUnique({
+      where: { id: vehicleId },
+      include: {
+        _count: {
+          select: {
+            orders: true,
+            pings: true,
+          },
+        },
+      },
+    });
+
+    if (!existingVehicle) {
+      return res.status(404).json({ error: 'Vehicle not found' });
+    }
+
+    // Delete associated pings first
+    if (existingVehicle._count.pings > 0) {
+      await prisma.locationPing.deleteMany({
+        where: { vehicleId },
+      });
+    }
+
+    // Check if vehicle has active orders
+    if (existingVehicle._count.orders > 0) {
+      // Update orders to remove vehicle reference instead of blocking deletion
+      await prisma.order.updateMany({
+        where: { vehicleId },
+        data: { vehicleId: null },
+      });
+    }
+
+    await prisma.vehicle.delete({
+      where: { id: vehicleId },
+    });
+
+    res.json({ message: 'Vehicle deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting vehicle:', error);
+    res.status(500).json({ error: 'Failed to delete vehicle' });
+  }
+});
+
 // POST /api/vehicles/:id/ping
 router.post('/:id/ping', async (req, res) => {
   try {

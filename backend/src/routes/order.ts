@@ -143,6 +143,106 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Update order
+router.put('/:id', async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+    const { code, origin, destination, vehicleId, status } = req.body;
+
+    if (isNaN(orderId)) {
+      return res.status(400).json({ error: 'Invalid order ID' });
+    }
+
+    // Check if order exists
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: orderId }
+    });
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Validate status if provided
+    if (status && !Object.values(OrderStatus).includes(status)) {
+      return res.status(400).json({ 
+        error: `Invalid status. Must be one of: ${Object.values(OrderStatus).join(', ')}` 
+      });
+    }
+
+    // Validate status transition if status is being changed
+    if (status && status !== existingOrder.status) {
+      if (!isValidTransition(existingOrder.status as OrderStatus, status)) {
+        const allowedStatuses = ALLOWED_TRANSITIONS[existingOrder.status as OrderStatus] || [];
+        const previousStatus = getPreviousStatus(existingOrder.status as OrderStatus);
+        const allAllowed = [...allowedStatuses];
+        if (previousStatus) allAllowed.push(previousStatus);
+        
+        return res.status(400).json({ 
+          error: `Invalid status transition from ${existingOrder.status} to ${status}. Allowed transitions: ${allAllowed.join(', ')}` 
+        });
+      }
+    }
+
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        ...(code && { code }),
+        ...(origin && { origin }),
+        ...(destination && { destination }),
+        ...(vehicleId !== undefined && { vehicleId: vehicleId ? parseInt(vehicleId) : null }),
+        ...(status && { status }),
+        updatedAt: new Date()
+      },
+      include: {
+        vehicle: true,
+        company: true,
+        createdBy: true,
+        assignedTo: true
+      }
+    });
+
+    res.json(order);
+  } catch (error: any) {
+    console.error('Update order error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete order (Admin only)
+router.delete('/:id', requireRole(Role.ADMIN), async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+
+    if (isNaN(orderId)) {
+      return res.status(400).json({ error: 'Invalid order ID' });
+    }
+
+    // Check if order exists
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: orderId }
+    });
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Delete order history entries first
+    await prisma.orderStatusHistory.deleteMany({
+      where: { orderId }
+    });
+
+    // Then delete the order
+    await prisma.order.delete({
+      where: { id: orderId }
+    });
+
+    res.json({ message: 'Order deleted successfully' });
+  } catch (error: any) {
+    console.error('Delete order error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update order status (Admin only)
 router.patch('/:id/status', requireRole(Role.ADMIN), async (req, res) => {
   try {

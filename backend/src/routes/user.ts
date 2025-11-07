@@ -88,6 +88,104 @@ router.post('/', requireRole(Role.ADMIN), async (req, res) => {
   }
 });
 
+// Update user (Admin only)
+router.put('/:id', requireRole(Role.ADMIN), async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const { email, name, role, companyId } = req.body;
+
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // If email is being changed, check for conflicts
+    if (email && email !== existingUser.email) {
+      const emailConflict = await prisma.user.findUnique({
+        where: { email }
+      });
+
+      if (emailConflict) {
+        return res.status(409).json({ 
+          error: 'User with this email already exists' 
+        });
+      }
+    }
+
+    // Validate role if provided
+    if (role && !Object.values(Role).includes(role)) {
+      return res.status(400).json({ 
+        error: `Invalid role. Must be one of: ${Object.values(Role).join(', ')}` 
+      });
+    }
+
+    // CLIENT_ADMIN must have a company
+    if (role === Role.CLIENT_ADMIN && companyId === null) {
+      return res.status(400).json({ 
+        error: 'CLIENT_ADMIN role requires a companyId' 
+      });
+    }
+
+    // Update user
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(email && { email }),
+        ...(name && { name }),
+        ...(role && { role }),
+        ...(companyId !== undefined && { companyId: companyId || null })
+      },
+      include: {
+        company: true
+      }
+    });
+
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = updatedUser;
+    
+    res.json(userWithoutPassword);
+  } catch (error: any) {
+    console.error('Update user error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete user (Admin only)
+router.delete('/:id', requireRole(Role.ADMIN), async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Prevent deleting yourself
+    if (req.user?.id === userId) {
+      return res.status(400).json({ 
+        error: 'You cannot delete your own account' 
+      });
+    }
+
+    await prisma.user.delete({
+      where: { id: userId }
+    });
+
+    res.json({ message: 'User deleted successfully' });
+  } catch (error: any) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get users by company (Admin or company's CLIENT_ADMIN)
 router.get('/company/:companyId', async (req, res) => {
   try {
