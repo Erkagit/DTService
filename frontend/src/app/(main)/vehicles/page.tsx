@@ -72,10 +72,10 @@ export default function VehiclesPage() {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       setShowCreateVehicle(false);
       setVehicleForm({ plateNo: '', driverName: '', driverPhone: '', deviceId: '' });
-      alert('Vehicle created successfully!');
+      alert('✅ Тээврийн хэрэгсэл амжилттай үүсгэлээ!');
     },
     onError: (error: any) => {
-      alert(error.response?.data?.error || 'Failed to create vehicle');
+      alert('❌ ' + (error.response?.data?.error || 'Тээврийн хэрэгсэл үүсгэх амжилтгүй боллоо'));
     },
   });
 
@@ -87,10 +87,10 @@ export default function VehiclesPage() {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       setShowCreateDevice(false);
       setDeviceForm({ deviceId: '' });
-      alert('Device created successfully!');
+      alert('✅ Төхөөрөмж амжилттай үүсгэлээ!');
     },
     onError: (error: any) => {
-      alert(error.response?.data?.error || 'Failed to create device');
+      alert('❌ ' + (error.response?.data?.error || 'Төхөөрөмж үүсгэх амжилтгүй боллоо'));
     },
   });
 
@@ -108,10 +108,10 @@ export default function VehiclesPage() {
       setShowEditVehicle(false);
       setEditingVehicle(null);
       setEditVehicleForm({ plateNo: '', driverName: '', driverPhone: '', deviceId: '' });
-      alert('✅ Vehicle updated successfully!');
+      alert('✅ Тээврийн хэрэгсэл амжилттай шинэчлэгдлээ!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to update vehicle'));
+      alert('❌ ' + (error.response?.data?.error || 'Тээврийн хэрэгсэл шинэчлэх амжилтгүй боллоо'));
     },
   });
 
@@ -121,10 +121,10 @@ export default function VehiclesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-      alert('✅ Vehicle deleted successfully!');
+      alert('✅ Тээврийн хэрэгсэл амжилттай устгагдлаа!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to delete vehicle'));
+      alert('❌ ' + (error.response?.data?.error || 'Тээврийн хэрэгсэл устгах амжилтгүй боллоо'));
     },
   });
 
@@ -137,10 +137,10 @@ export default function VehiclesPage() {
       setShowEditDevice(false);
       setEditingDevice(null);
       setEditDeviceForm({ deviceId: '' });
-      alert('✅ Device updated successfully!');
+      alert('✅ Төхөөрөмж амжилттай шинэчлэгдлээ!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to update device'));
+      alert('❌ ' + (error.response?.data?.error || 'Төхөөрөмж шинэчлэх амжилтгүй боллоо'));
     },
   });
 
@@ -150,10 +150,10 @@ export default function VehiclesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
-      alert('✅ Device deleted successfully!');
+      alert('✅ Төхөөрөмж амжилттай устгагдлаа!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to delete device'));
+      alert('❌ ' + (error.response?.data?.error || 'Төхөөрөмж устгах амжилтгүй боллоо'));
     },
   });
 
@@ -199,8 +199,8 @@ export default function VehiclesPage() {
     <div className="min-h-screen bg-gray-50">
       <PageHeader
         icon={<Truck className="w-8 h-8 text-green-600" />}
-        title="Vehicles"
-        subtitle="Manage your fleet and GPS devices"
+        title="Тээврийн хэрэгсэл"
+        subtitle="Тээврийн хэрэгсэл болон GPS төхөөрөмж удирдлага"
         action={
           <div className="flex gap-2">
             {user.role === 'ADMIN' && (
@@ -209,7 +209,7 @@ export default function VehiclesPage() {
                 onClick={() => setShowCreateDevice(true)}
               >
                 <Plus className="w-5 h-5 mr-2" />
-                New Device
+                Шинэ төхөөрөмж
               </Button>
             )}
             <Button
@@ -217,7 +217,7 @@ export default function VehiclesPage() {
               onClick={() => setShowCreateVehicle(true)}
             >
               <Plus className="w-5 h-5 mr-2" />
-              New Vehicle
+              Шинэ тээврийн хэрэгсэл
             </Button>
           </div>
         }
@@ -296,9 +296,9 @@ export default function VehiclesPage() {
         ) : (
           <EmptyState
             icon={Truck}
-            title="No vehicles registered"
-            description="Add your first vehicle to start tracking"
-            actionLabel="Add Vehicle"
+            title="Бүртгэлтэй тээврийн хэрэгсэл байхгүй"
+            description="Эхний тээврийн хэрэгслээ нэмж хяналт эхлүүлнэ үү"
+            actionLabel="Тээврийн хэрэгсэл нэмэх"
             onAction={() => setShowCreateVehicle(true)}
           />
         )}

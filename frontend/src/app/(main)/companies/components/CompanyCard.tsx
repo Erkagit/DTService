@@ -27,11 +27,11 @@ export function CompanyCard({ company, onAddUser, onViewDetails, onEdit, onDelet
                 <>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <UsersIcon className="w-4 h-4 text-gray-400" />
-                    <span>{company._count.users} Users</span>
+                    <span>{company._count.users} Хэрэглэгч</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Package className="w-4 h-4 text-gray-400" />
-                    <span>{company._count.orders} Orders</span>
+                    <span>{company._count.orders} Захиалга</span>
                   </div>
                 </>
               )}
@@ -55,8 +55,8 @@ export function CompanyCard({ company, onAddUser, onViewDetails, onEdit, onDelet
             fullWidth
             className="bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-200"
           >
-            <span className="hidden sm:inline">Add Client Admin</span>
-            <span className="sm:hidden">Add Admin</span>
+            <span className="hidden sm:inline">Харилцагчийн админ нэмэх</span>
+            <span className="sm:hidden">Админ нэмэх</span>
           </Button>
           <div className="flex gap-2 sm:flex-none">
             <Button
@@ -69,7 +69,7 @@ export function CompanyCard({ company, onAddUser, onViewDetails, onEdit, onDelet
               icon={Edit2}
               className="flex-1 sm:flex-none bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
             >
-              <span className="hidden sm:inline">Edit</span>
+              <span className="hidden sm:inline">Засах</span>
             </Button>
             <Button
               onClick={(e) => {
@@ -81,7 +81,7 @@ export function CompanyCard({ company, onAddUser, onViewDetails, onEdit, onDelet
               icon={Trash2}
               className="flex-1 sm:flex-none bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
             >
-              <span className="hidden sm:inline">Delete</span>
+              <span className="hidden sm:inline">Устгах</span>
             </Button>
           </div>
         </div>

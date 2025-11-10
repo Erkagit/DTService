@@ -21,7 +21,7 @@ export default function LoginPage() {
     setError('');
     
     if (!email || !password) {
-      setError('Email/Name and password are required');
+      setError('Имэйл/Нэр болон нууц үг шаардлагатай');
       return;
     }
 
@@ -42,11 +42,11 @@ export default function LoginPage() {
       
       // Check if it's a password/authentication error
       if (err.response?.status === 401) {
-        setError('Incorrect email/name or password. Please try again.');
+        setError('Имэйл/нэр эсвэл нууц үг буруу байна. Дахин оролдоно уу.');
       } else if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else {
-        setError('Unable to login. Please check your credentials and try again.');
+        setError('Нэвтрэх боломжгүй байна. Нэвтрэх мэдээллээ шалгаад дахин оролдоно уу.');
       }
     } finally {
       setLoading(false);
@@ -55,24 +55,24 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
-      <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl border border-gray-100">
+      <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-2xl sm:max-w-lg border border-gray-100 mx-auto">
         {/* Header */}
         <div className="flex flex-col items-center mb-6 sm:mb-8">
           <div className="p-3 sm:p-4 bg-linear-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg mb-3 sm:mb-4">
             <Truck className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white" />
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-xs sm:text-sm lg:text-base text-gray-500 mt-2 text-center">Sign in to your Achir Bayron LLC account</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Тавтай морилно уу</h1>
+          <p className="text-xs sm:text-sm lg:text-base text-gray-500 mt-2 text-center">Ачир Байрон ХХК-ийн хүргэлтийн системд нэвтрэх</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           {/* Email or Name */}
           <Input
-            label="Email or Name"
+            label="Имэйл эсвэл Нэр"
             type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="your.email@company.com or your name"
+            placeholder="Имэйл эсвэл нэр"
             required
             autoFocus
           />
@@ -80,7 +80,7 @@ export default function LoginPage() {
           {/* Password */}
           <div>
             <label className="block text-xs sm:text-sm lg:text-base font-medium text-gray-700 mb-2">
-              Password
+              Нууц үг
             </label>
             <div className="relative">
               <input
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base lg:text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 pr-12 transition"
-                placeholder="Enter your password"
+                placeholder="Нууц үгээ оруулна уу"
                 required
               />
               <button
@@ -119,12 +119,12 @@ export default function LoginPage() {
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 border-b-2 border-white mr-2"></div>
-                <span className="text-sm sm:text-base lg:text-lg">Signing in...</span>
+                <span className="text-sm sm:text-base lg:text-lg">Нэвтэрч байна...</span>
               </>
             ) : (
               <>
                 <Lock className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 mr-2" />
-                <span className="text-sm sm:text-base lg:text-lg">Sign In</span>
+                <span className="text-sm sm:text-base lg:text-lg">Нэвтрэх</span>
               </>
             )}
           </Button>
@@ -135,18 +135,18 @@ export default function LoginPage() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
             <p className="text-xs sm:text-sm lg:text-base font-semibold text-blue-900 mb-2 sm:mb-3 flex items-center gap-2">
               <Lock className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5" />
-              Test Credentials
+              Туршилтын нэвтрэх мэдээлэл
             </p>
             <div className="space-y-2 text-xs sm:text-sm">
               <div className="bg-white rounded p-2 sm:p-3">
-                <p className="font-medium text-gray-900">Admin</p>
-                <p className="text-gray-600 break-all">Email: <code className="bg-gray-100 px-1 py-0.5 rounded text-[10px] sm:text-xs lg:text-sm">admin@dts.local</code></p>
-                <p className="text-gray-600">Password: <code className="bg-gray-100 px-1 py-0.5 rounded text-[10px] sm:text-xs lg:text-sm">password123</code></p>
+                <p className="font-medium text-gray-900">Админ</p>
+                <p className="text-gray-600 break-all">Имэйл: <code className="bg-gray-100 px-1 py-0.5 rounded text-[10px] sm:text-xs lg:text-sm">admin@dts.local</code></p>
+                <p className="text-gray-600">Нууц үг: <code className="bg-gray-100 px-1 py-0.5 rounded text-[10px] sm:text-xs lg:text-sm">password123</code></p>
               </div>
               <div className="bg-white rounded p-2 sm:p-3">
-                <p className="font-medium text-gray-900">Client Admin</p>
-                <p className="text-gray-600 break-all">Email: <code className="bg-gray-100 px-1 py-0.5 rounded text-[10px] sm:text-xs lg:text-sm">client@acme.local</code></p>
-                <p className="text-gray-600">Password: <code className="bg-gray-100 px-1 py-0.5 rounded text-[10px] sm:text-xs lg:text-sm">password123</code></p>
+                <p className="font-medium text-gray-900">Харилцагчийн Админ</p>
+                <p className="text-gray-600 break-all">Имэйл: <code className="bg-gray-100 px-1 py-0.5 rounded text-[10px] sm:text-xs lg:text-sm">client@acme.local</code></p>
+                <p className="text-gray-600">Нууц үг: <code className="bg-gray-100 px-1 py-0.5 rounded text-[10px] sm:text-xs lg:text-sm">password123</code></p>
               </div>
             </div>
           </div>
@@ -155,14 +155,14 @@ export default function LoginPage() {
         {/* Footer Info */}
         <div className="mt-4 sm:mt-6 text-center">
           <p className="text-[10px] sm:text-xs lg:text-sm text-gray-500">
-            Contact your administrator for account access
+            Хандах эрхийн талаар админтай холбогдон мэдээлэл авна уу.
           </p>
         </div>
 
         {/* Powered by */}
         <div className="mt-3 sm:mt-4 text-center">
           <p className="text-[10px] sm:text-xs lg:text-sm text-gray-400">
-            Powered by Achir Bayron LLC © 2025
+            Ачир Байрон ХХК © 2025
           </p>
         </div>
       </div>

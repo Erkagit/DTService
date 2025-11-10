@@ -108,10 +108,10 @@ export default function OrdersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       handleCloseCreateModal();
-      alert('✅ Order created successfully!');
+      alert('✅ Захиалга амжилттай үүсгэлээ!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to create order'));
+      alert('❌ ' + (error.response?.data?.error || 'Захиалга үүсгэх амжилтгүй боллоо'));
     },
   });
 
@@ -144,7 +144,7 @@ export default function OrdersPage() {
       if (context?.previousOrders) {
         queryClient.setQueryData(['orders'], context.previousOrders);
       }
-      alert('❌ ' + (error.response?.data?.error || 'Failed to update status'));
+      alert('❌ ' + (error.response?.data?.error || 'Статус шинэчлэх амжилтгүй боллоо'));
     },
     onSuccess: () => {
       // Refetch to get the latest data from server
@@ -159,10 +159,10 @@ export default function OrdersPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      alert('✅ Order deleted successfully!');
+      alert('✅ Захиалга амжилттай устгагдлаа!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to delete order'));
+      alert('❌ ' + (error.response?.data?.error || 'Захиалга устгах амжилтгүй боллоо'));
     },
   });
 
@@ -238,7 +238,7 @@ export default function OrdersPage() {
   };
 
   const handleQuickStatusUpdate = (order: any, newStatus: OrderStatus) => {
-    if (confirm(`Update order ${order.code} status to ${newStatus.replace(/_/g, ' ')}?`)) {
+    if (confirm(`Захиалга ${order.code}-ын статусыг ${newStatus.replace(/_/g, ' ')} болгон шинэчлэх үү?`)) {
       updateStatusMutation.mutate({
         orderId: order.id,
         status: newStatus,
@@ -248,7 +248,7 @@ export default function OrdersPage() {
   };
 
   const handleDeleteOrder = (order: any) => {
-    if (confirm(`Are you sure you want to delete order "${order.code}"? This action cannot be undone.`)) {
+    if (confirm(`"${order.code}" захиалгыг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.`)) {
       deleteOrderMutation.mutate(order.id);
     }
   };
@@ -271,12 +271,12 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-gray-50">
       <PageHeader
         icon={<Package className="w-8 h-8 text-blue-600" />}
-        title="Orders"
-        subtitle="Delivery order management"
+        title="Захиалга"
+        subtitle="Хүргэлтийн захиалга удирдлага"
         action={
           user.role === 'ADMIN' ? (
             <Button icon={Plus} onClick={handleCreateClick}>
-              New Order
+              Шинэ захиалга
             </Button>
           ) : undefined
         }
@@ -322,9 +322,9 @@ export default function OrdersPage() {
             <section>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Active Orders</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Идэвхтэй захиалгууд</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    {activeOrders.length} order{activeOrders.length !== 1 ? 's' : ''} in progress
+                    {activeOrders.length} захиалга үргэлжилж байна
                   </p>
                 </div>
               </div>
@@ -346,7 +346,7 @@ export default function OrdersPage() {
               ) : (
                 <div className="bg-white rounded-lg border-2 border-dashed border-gray-200 p-8 text-center">
                   <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">No active orders</p>
+                  <p className="text-gray-500">Идэвхтэй захиалга байхгүй</p>
                 </div>
               )}
             </section>
@@ -355,9 +355,9 @@ export default function OrdersPage() {
             <section>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Completed Orders</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">Дууссан захиалгууд</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    {completedOrders.length} order{completedOrders.length !== 1 ? 's' : ''} finished
+                    {completedOrders.length} захиалга дууссан
                   </p>
                 </div>
                 {completedOrders.length > 0 && (
@@ -365,7 +365,7 @@ export default function OrdersPage() {
                     variant="ghost"
                     onClick={() => setShowCompleted(!showCompleted)}
                   >
-                    {showCompleted ? 'Hide' : 'Show'} Completed
+                    {showCompleted ? 'Нуух' : 'Харуулах'}
                   </Button>
                 )}
               </div>
@@ -389,14 +389,14 @@ export default function OrdersPage() {
               {!showCompleted && completedOrders.length > 0 && (
                 <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                   <p className="text-gray-600">
-                    {completedOrders.length} completed order{completedOrders.length !== 1 ? 's' : ''} hidden
+                    {completedOrders.length} дууссан захиалга нуугдсан
                   </p>
                   <Button
                     variant="ghost"
                     onClick={() => setShowCompleted(true)}
                     className="mt-3"
                   >
-                    Show Completed Orders
+                    Дууссан захиалга харуулах
                   </Button>
                 </div>
               )}
@@ -405,9 +405,9 @@ export default function OrdersPage() {
         ) : (
           <EmptyState
             icon={Package}
-            title="No orders yet"
-            description="Create your first order to get started"
-            actionLabel="Create Order"
+            title="Захиалга байхгүй байна"
+            description="Эхлээд захиалга үүсгэнэ үү"
+            actionLabel="Захиалга үүсгэх"
             onAction={handleCreateClick}
           />
         )}

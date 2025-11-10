@@ -25,22 +25,22 @@ export function EditCompanyModal({
   if (!company) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Edit Company">
+    <Modal isOpen={isOpen} onClose={onClose} title="Компани засах">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
-          label="Company Name"
+          label="Компанийн нэр"
           value={formData.name}
           onChange={(e) => onChange({ name: e.target.value })}
           required
-          placeholder="Enter company name"
+          placeholder="Компанийн нэр оруулна уу"
         />
 
         <div className="flex gap-3 justify-end">
           <Button type="button" variant="ghost" onClick={onClose}>
-            Cancel
+            Цуцлах
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Updating...' : 'Update Company'}
+            {isLoading ? 'Шинэчилж байна...' : 'Компани шинэчлэх'}
           </Button>
         </div>
       </form>

@@ -66,7 +66,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">Ачааллаж байна...</p>
         </div>
       </div>
     );
@@ -74,48 +74,48 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      label: 'Total Orders',
+      label: 'Нийт захиалга',
       value: orders?.length || 0,
       icon: Package,
       color: 'bg-blue-500',
       loading: ordersLoading,
       link: '/orders',
-      description: 'Active & completed orders',
+      description: 'Идэвхтэй болон дууссан захиалга',
     },
     ...(user.role === 'ADMIN' ? [{
-      label: 'Active Vehicles',
+      label: 'Идэвхтэй тээврийн хэрэгсэл',
       value: vehicles?.length || 0,
       icon: Truck,
       color: 'bg-green-500',
       loading: vehiclesLoading,
       link: '/vehicles',
-      description: 'Fleet in operation',
+      description: 'Ажиллаж байгаа хэрэгсэл',
     }] : []),
   ];
 
   // Add Companies card for Admin users
   if (user.role === 'ADMIN') {
     stats.push({
-      label: 'Companies',
+      label: 'Компаниуд',
       value: companies?.length || 0,
       icon: Building2,
       color: 'bg-purple-500',
       loading: companiesLoading,
       link: '/companies',
-      description: 'Registered companies',
+      description: 'Бүртгэлтэй компаниуд',
     });
   }
 
   // Add My Company card for CLIENT_ADMIN users
   if (user.role === 'CLIENT_ADMIN' && user.companyId) {
     stats.push({
-      label: 'My Company',
+      label: 'Миний компани',
       value: 1,
       icon: Building2,
       color: 'bg-purple-500',
       loading: false,
       link: `/companies/${user.companyId}`,
-      description: 'View company details',
+      description: 'Компанийн дэлгэрэнгүй',
     });
   }
 
@@ -123,14 +123,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-50">
       <PageHeader
         icon={<Truck className="w-8 h-8 text-blue-600" />}
-        title="Dashboard"
-        subtitle="Delivery Tracking System Overview"
+        title="Хянах самбар"
+        subtitle="Хүргэлтийн системийн ерөнхий мэдээлэл"
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
         <div className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Overview</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Тойм</h2>
           <div className={`grid grid-cols-1 md:grid-cols-2 ${user.role === 'ADMIN' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
             {stats.map((stat) => (
               <StatCard key={stat.label} {...stat} />
@@ -142,14 +142,14 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200 flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
-              <p className="text-sm text-gray-500 mt-1">Latest delivery orders</p>
+              <h2 className="text-xl font-bold text-gray-900">Сүүлийн захиалгууд</h2>
+              <p className="text-sm text-gray-500 mt-1">Хамгийн сүүлд үүссэн захиалгууд</p>
             </div>
             <Link
               href="/orders"
               className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 hover:gap-2 transition-all"
             >
-              View all
+              Бүгдийг харах
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -203,9 +203,9 @@ export default function DashboardPage() {
             ) : (
               <EmptyState
                 icon={Package}
-                title="No orders found"
-                description="Create your first order to get started"
-                actionLabel="Create First Order"
+                title="Захиалга олдсонгүй"
+                description="Эхний захиалгаа үүсгэж эхлээрэй"
+                actionLabel="Эхний захиалга үүсгэх"
                 onAction={() => {}}
               />
             )}

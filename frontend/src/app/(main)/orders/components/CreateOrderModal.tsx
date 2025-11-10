@@ -16,10 +16,10 @@ export function CreateOrderModal({
   isLoading,
 }: CreateOrderModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create New Order">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ захиалга үүсгэх">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
-          label="Order Code"
+          label="Захиалгын код"
           type="text"
           value={formData.code}
           onChange={(e) => onChange({ ...formData, code: e.target.value })}
@@ -28,29 +28,29 @@ export function CreateOrderModal({
         />
 
         <Input
-          label="Origin"
+          label="Эх газар"
           type="text"
           value={formData.origin}
           onChange={(e) => onChange({ ...formData, origin: e.target.value })}
-          placeholder="Ulaanbaatar"
+          placeholder="Улаанбаатар"
           required
         />
 
         <Input
-          label="Destination"
+          label="Очих газар"
           type="text"
           value={formData.destination}
           onChange={(e) => onChange({ ...formData, destination: e.target.value })}
-          placeholder="Zamyn-Uud"
+          placeholder="Замын-Үүд"
           required
         />
 
         <Select
-          label="Vehicle"
+          label="Тээврийн хэрэгсэл"
           value={formData.vehicleId}
           onChange={(e) => onChange({ ...formData, vehicleId: e.target.value })}
         >
-          <option value="">Select vehicle...</option>
+          <option value="">Тээврийн хэрэгсэл сонгох...</option>
           {vehicles?.map((vehicle) => (
             <option key={vehicle.id} value={vehicle.id}>
               {vehicle.plateNo} - {vehicle.driverName}
@@ -60,12 +60,12 @@ export function CreateOrderModal({
 
         {isAdmin && companies && (
           <Select
-            label="Company"
+            label="Компани"
             value={formData.companyId}
             onChange={(e) => onChange({ ...formData, companyId: e.target.value })}
             required
           >
-            <option value="">Select company...</option>
+            <option value="">Компани сонгох...</option>
             {companies.map((company) => (
               <option key={company.id} value={company.id}>
                 {company.name}
@@ -76,10 +76,10 @@ export function CreateOrderModal({
 
         <div className="flex gap-3 pt-4">
           <Button type="button" onClick={onClose} variant="secondary" fullWidth>
-            Cancel
+            Цуцлах
           </Button>
           <Button type="submit" disabled={isLoading} fullWidth>
-            {isLoading ? 'Creating...' : 'Create Order'}
+            {isLoading ? 'Үүсгэж байна...' : 'Захиалга үүсгэх'}
           </Button>
         </div>
       </form>

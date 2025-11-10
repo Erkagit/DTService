@@ -14,19 +14,19 @@ export function CreateVehicleModal({
   isLoading,
 }: CreateVehicleModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add New Vehicle">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ тээврийн хэрэгсэл нэмэх">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
-          label="Plate Number"
+          label="Улсын дугаар"
           type="text"
           value={formData.plateNo}
           onChange={(e) => onChange({ ...formData, plateNo: e.target.value })}
-          placeholder="UBX-1234"
+          placeholder="УБХ-1234"
           required
         />
 
         <Input
-          label="Driver Name"
+          label="Жолоочийн нэр"
           type="text"
           value={formData.driverName}
           onChange={(e) => onChange({ ...formData, driverName: e.target.value })}
@@ -35,7 +35,7 @@ export function CreateVehicleModal({
         />
 
         <Input
-          label="Driver Phone"
+          label="Жолоочийн утас"
           type="tel"
           value={formData.driverPhone}
           onChange={(e) => onChange({ ...formData, driverPhone: e.target.value })}
@@ -44,11 +44,11 @@ export function CreateVehicleModal({
         />
 
         <Select
-          label="GPS Device (Optional)"
+          label="GPS төхөөрөмж (Сонголттой)"
           value={formData.deviceId}
           onChange={(e) => onChange({ ...formData, deviceId: e.target.value })}
         >
-          <option value="">No device</option>
+          <option value="">Төхөөрөмжгүй</option>
           {devices?.map((device: any) => (
             <option key={device.id} value={device.id}>
               {device.deviceId}
@@ -58,10 +58,10 @@ export function CreateVehicleModal({
 
         <div className="flex gap-3 pt-4">
           <Button type="button" onClick={onClose} variant="secondary" fullWidth>
-            Cancel
+            Цуцлах
           </Button>
           <Button type="submit" disabled={isLoading} variant="success" fullWidth>
-            {isLoading ? 'Creating...' : 'Create Vehicle'}
+            {isLoading ? 'Үүсгэж байна...' : 'Тээврийн хэрэгсэл үүсгэх'}
           </Button>
         </div>
       </form>

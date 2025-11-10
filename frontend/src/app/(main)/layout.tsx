@@ -31,13 +31,13 @@ export default function MainLayout({
   };
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'CLIENT_ADMIN'] },
-    { name: 'Orders', href: '/orders', icon: Package, roles: ['ADMIN', 'CLIENT_ADMIN'] },
-    { name: 'Vehicles', href: '/vehicles', icon: Truck, roles: ['ADMIN'] },
-    { name: 'Companies', href: '/companies', icon: Building2, roles: ['ADMIN'] },
-    { name: 'Users', href: '/users', icon: Users, roles: ['ADMIN'] },
+    { name: 'Хянах самбар', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'CLIENT_ADMIN'] },
+    { name: 'Захиалга', href: '/orders', icon: Package, roles: ['ADMIN', 'CLIENT_ADMIN'] },
+    { name: 'Тээврийн хэрэгсэл', href: '/vehicles', icon: Truck, roles: ['ADMIN'] },
+    { name: 'Компаниуд', href: '/companies', icon: Building2, roles: ['ADMIN'] },
+    { name: 'Хэрэглэгчид', href: '/users', icon: Users, roles: ['ADMIN'] },
     ...(user?.role === 'CLIENT_ADMIN' && user.companyId ? [
-      { name: 'My Company', href: `/companies/${user.companyId}`, icon: Building2, roles: ['CLIENT_ADMIN'] }
+      { name: 'Миний компани', href: `/companies/${user.companyId}`, icon: Building2, roles: ['CLIENT_ADMIN'] }
     ] : []),
   ];
 
@@ -143,7 +143,7 @@ export default function MainLayout({
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
             >
               <LogOut className="w-5 h-5" />
-              <span>Logout</span>
+              <span>Гарах</span>
             </button>
           </div>
         </div>

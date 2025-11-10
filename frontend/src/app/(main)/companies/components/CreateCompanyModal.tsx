@@ -12,10 +12,10 @@ export function CreateCompanyModal({
   isLoading,
 }: CreateCompanyModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create New Company">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ компани үүсгэх">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
-          label="Company Name"
+          label="Компанийн нэр"
           type="text"
           value={formData.name}
           onChange={(e) => onChange({ name: e.target.value })}
@@ -25,10 +25,10 @@ export function CreateCompanyModal({
 
         <div className="flex gap-3 pt-4">
           <Button type="button" onClick={onClose} variant="secondary" fullWidth>
-            Cancel
+            Цуцлах
           </Button>
           <Button type="submit" disabled={isLoading} fullWidth>
-            {isLoading ? 'Creating...' : 'Create Company'}
+            {isLoading ? 'Үүсгэж байна...' : 'Компани үүсгэх'}
           </Button>
         </div>
       </form>

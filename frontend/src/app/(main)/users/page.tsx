@@ -44,7 +44,7 @@ export default function UsersPage() {
       setUsers(response.data);
     } catch (err: any) {
       console.error('Error fetching users:', err);
-      setError(err.response?.data?.error || 'Failed to fetch users');
+      setError(err.response?.data?.error || 'Хэрэглэгчдийг татах амжилтгүй боллоо');
     } finally {
       setLoading(false);
     }
@@ -72,12 +72,12 @@ export default function UsersPage() {
       };
 
       await api.post('/api/users', userData);
-      setSuccess('User created successfully!');
+      setSuccess('✅ Хэрэглэгч амжилттай үүсгэлээ!');
       setShowCreateModal(false);
       setFormData({ email: '', name: '', password: '', role: 'CLIENT_ADMIN', companyId: '' });
       fetchUsers();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to create user');
+      setError(err.response?.data?.error || 'Хэрэглэгч үүсгэх амжилтгүй боллоо');
     } finally {
       setSubmitting(false);
     }
@@ -117,21 +117,21 @@ export default function UsersPage() {
 
       await api.put(`/api/users/${editingUser.id}`, userData);
       setSuccess(passwordData?.newPassword 
-        ? 'User and password updated successfully!' 
-        : 'User updated successfully!');
+        ? '✅ Хэрэглэгч болон нууц үг амжилттай шинэчлэгдлээ!' 
+        : '✅ Хэрэглэгч амжилттай шинэчлэгдлээ!');
       setShowEditModal(false);
       setEditingUser(null);
       setEditFormData({ email: '', name: '', role: 'CLIENT_ADMIN', companyId: '' });
       fetchUsers();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to update user');
+      setError(err.response?.data?.error || 'Хэрэглэгч шинэчлэх амжилтгүй боллоо');
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDeleteUser = async (user: User) => {
-    if (!confirm(`Are you sure you want to delete user "${user.name}"? This action cannot be undone.`)) {
+    if (!confirm(`"${user.name}" хэрэглэгчийг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.`)) {
       return;
     }
 
@@ -140,10 +140,10 @@ export default function UsersPage() {
 
     try {
       await api.delete(`/api/users/${user.id}`);
-      setSuccess('User deleted successfully!');
+      setSuccess('✅ Хэрэглэгч амжилттай устгагдлаа!');
       fetchUsers();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to delete user');
+      setError(err.response?.data?.error || 'Хэрэглэгч устгах амжилтгүй боллоо');
     }
   };
 
@@ -151,7 +151,7 @@ export default function UsersPage() {
     return (
       <div className="p-8">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          Access denied. Admin role required.
+          Хандах эрхгүй. Админ эрх шаардлагатай.
         </div>
       </div>
     );
@@ -161,12 +161,12 @@ export default function UsersPage() {
     <div className="min-h-screen bg-gray-50">
       <PageHeader
         icon={<UserPlus className="w-8 h-8 text-blue-600" />}
-        title="User Management"
-        subtitle="Manage system users and permissions"
+        title="Хэрэглэгч удирдлага"
+        subtitle="Системийн хэрэглэгч болон эрх удирдлага"
         action={
           <Button onClick={() => setShowCreateModal(true)}>
             <UserPlus className="w-5 h-5 mr-2" />
-            Create User
+            Хэрэглэгч үүсгэх
           </Button>
         }
       />

@@ -52,10 +52,10 @@ export default function CompaniesPage() {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       setShowCreateForm(false);
       setFormData({ name: '' });
-      alert('Company created successfully!');
+      alert('✅ Компани амжилттай үүсгэлээ!');
     },
     onError: (error: any) => {
-      alert(error.response?.data?.error || 'Failed to create company');
+      alert('❌ ' + (error.response?.data?.error || 'Компани үүсгэх амжилтгүй боллоо'));
     },
   });
 
@@ -68,10 +68,10 @@ export default function CompaniesPage() {
       setShowCreateUserModal(false);
       setSelectedCompany(null);
       setUserFormData({ email: '', name: '', password: '' });
-      alert('✅ Client Admin user created successfully!');
+      alert('✅ Харилцагчийн админ хэрэглэгч амжилттай үүсгэлээ!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to create user'));
+      alert('❌ ' + (error.response?.data?.error || 'Хэрэглэгч үүсгэх амжилтгүй боллоо'));
     },
   });
 
@@ -84,10 +84,10 @@ export default function CompaniesPage() {
       setShowEditModal(false);
       setEditingCompany(null);
       setEditFormData({ name: '' });
-      alert('✅ Company updated successfully!');
+      alert('✅ Компани амжилттай шинэчлэгдлээ!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to update company'));
+      alert('❌ ' + (error.response?.data?.error || 'Компани шинэчлэх амжилтгүй боллоо'));
     },
   });
 
@@ -97,10 +97,10 @@ export default function CompaniesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
-      alert('✅ Company deleted successfully!');
+      alert('✅ Компани амжилттай устгагдлаа!');
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Failed to delete company'));
+      alert('❌ ' + (error.response?.data?.error || 'Компани устгах амжилтгүй боллоо'));
     },
   });
 
@@ -132,7 +132,7 @@ export default function CompaniesPage() {
       setShowDetailsModal(true);
     } catch (error: any) {
       console.error('Error fetching company details:', error);
-      alert('Failed to load company details');
+      alert('❌ Компанийн мэдээлэл татах амжилтгүй боллоо');
     }
   };
 
@@ -155,7 +155,7 @@ export default function CompaniesPage() {
   };
 
   const handleDeleteCompany = (company: any) => {
-    if (confirm(`Are you sure you want to delete "${company.name}"? This action cannot be undone.`)) {
+    if (confirm(`"${company.name}"-г устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.`)) {
       deleteCompanyMutation.mutate(company.id);
     }
   };
@@ -169,8 +169,8 @@ export default function CompaniesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-          <p className="text-gray-600 mb-4">Admin access required</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Хандах эрхгүй</h1>
+          <p className="text-gray-600 mb-4">Админ эрх шаардлагатай</p>
         </div>
       </div>
     );
@@ -180,10 +180,10 @@ export default function CompaniesPage() {
     <div className="min-h-screen bg-gray-50">
       <PageHeader
         icon={<Building2 className="w-8 h-8 text-purple-600" />}
-        title="Companies"
+        title="Компаниуд"
         action={
           <Button icon={Plus} onClick={() => setShowCreateForm(true)}>
-            New Company
+            Шинэ компани
           </Button>
         }
       />
@@ -250,9 +250,9 @@ export default function CompaniesPage() {
         ) : (
           <EmptyState
             icon={Building2}
-            title="No companies yet"
-            description="Create your first company"
-            actionLabel="Create Company"
+            title="Компани байхгүй байна"
+            description="Эхний компаниа үүсгэнэ үү"
+            actionLabel="Компани үүсгэх"
             onAction={() => setShowCreateForm(true)}
           />
         )}
