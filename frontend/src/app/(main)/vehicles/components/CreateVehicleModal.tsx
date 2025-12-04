@@ -60,7 +60,7 @@ export function CreateVehicleModal({
           <Button type="button" onClick={onClose} variant="secondary" fullWidth>
             Цуцлах
           </Button>
-          <Button type="submit" disabled={isLoading} variant="success" fullWidth>
+          <Button type="submit" disabled={isLoading} variant="primary" fullWidth>
             {isLoading ? 'Үүсгэж байна...' : 'Тээврийн хэрэгсэл үүсгэх'}
           </Button>
         </div>

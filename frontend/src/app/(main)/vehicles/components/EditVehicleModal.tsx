@@ -33,38 +33,38 @@ export function EditVehicleModal({
   if (!vehicle) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Edit Vehicle" maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="Тээврийн хэрэгсэл засах" maxWidth="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
-          label="Plate Number"
+          label="Улсын дугаар"
           value={formData.plateNo}
           onChange={(e) => onChange({ ...formData, plateNo: e.target.value })}
           required
-          placeholder="Enter plate number"
+          placeholder="Улсын дугаар оруулна уу"
         />
 
         <Input
-          label="Driver Name"
+          label="Жолоочийн нэр"
           value={formData.driverName}
           onChange={(e) => onChange({ ...formData, driverName: e.target.value })}
           required
-          placeholder="Enter driver name"
+          placeholder="Жолоочийн нэр оруулна уу"
         />
 
         <Input
-          label="Driver Phone"
+          label="Жолоочийн утас"
           value={formData.driverPhone}
           onChange={(e) => onChange({ ...formData, driverPhone: e.target.value })}
           required
-          placeholder="Enter driver phone"
+          placeholder="Жолоочийн утас оруулна уу"
         />
 
         <Select
-          label="GPS Device (Optional)"
+          label="GPS төхөөрөмж (Сонголттой)"
           value={formData.deviceId}
           onChange={(e) => onChange({ ...formData, deviceId: e.target.value })}
         >
-          <option value="">No Device</option>
+          <option value="">Төхөөрөмжгүй</option>
           {devices.map((device) => (
             <option key={device.id} value={device.id}>
               {device.deviceId}
@@ -72,12 +72,12 @@ export function EditVehicleModal({
           ))}
         </Select>
 
-        <div className="flex gap-3 justify-end">
-          <Button type="button" variant="ghost" onClick={onClose}>
-            Cancel
+        <div className="flex gap-3 pt-4">
+          <Button type="button" variant="secondary" onClick={onClose} fullWidth>
+            Цуцлах
           </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Updating...' : 'Update Vehicle'}
+          <Button type="submit" disabled={isLoading} variant="primary" fullWidth>
+            {isLoading ? 'Шинэчилж байна...' : 'Хадгалах'}
           </Button>
         </div>
       </form>

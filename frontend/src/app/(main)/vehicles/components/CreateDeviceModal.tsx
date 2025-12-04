@@ -12,10 +12,10 @@ export function CreateDeviceModal({
   isLoading,
 }: CreateDeviceModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create New Device" maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ GPS төхөөрөмж нэмэх" maxWidth="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
-          label="Device ID"
+          label="Төхөөрөмжийн ID"
           type="text"
           value={formData.deviceId}
           onChange={(e) => onChange({ deviceId: e.target.value })}
@@ -25,10 +25,10 @@ export function CreateDeviceModal({
 
         <div className="flex gap-3 pt-4">
           <Button type="button" onClick={onClose} variant="secondary" fullWidth>
-            Cancel
+            Цуцлах
           </Button>
-          <Button type="submit" disabled={isLoading} variant="secondary" fullWidth className="bg-gray-600 hover:bg-gray-700 text-white">
-            {isLoading ? 'Creating...' : 'Create Device'}
+          <Button type="submit" disabled={isLoading} variant="primary" fullWidth>
+            {isLoading ? 'Үүсгэж байна...' : 'Төхөөрөмж үүсгэх'}
           </Button>
         </div>
       </form>

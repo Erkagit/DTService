@@ -185,7 +185,7 @@ export default function VehiclesPage() {
   };
 
   const handleDeleteVehicle = (vehicle: any) => {
-    if (confirm(`Are you sure you want to delete vehicle "${vehicle.plateNo}"? This action cannot be undone.`)) {
+    if (confirm(`"${vehicle.plateNo}" тээврийн хэрэгслийг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.`)) {
       deleteVehicleMutation.mutate(vehicle.id);
     }
   };
@@ -198,7 +198,7 @@ export default function VehiclesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader
-        icon={<Truck className="w-8 h-8 text-green-600" />}
+        icon={<Truck className="w-8 h-8 text-gray-700" />}
         title="Тээврийн хэрэгсэл"
         subtitle="Тээврийн хэрэгсэл болон GPS төхөөрөмж удирдлага"
         action={
@@ -213,7 +213,7 @@ export default function VehiclesPage() {
               </Button>
             )}
             <Button
-              variant="success"
+              variant="primary"
               onClick={() => setShowCreateVehicle(true)}
             >
               <Plus className="w-5 h-5 mr-2" />

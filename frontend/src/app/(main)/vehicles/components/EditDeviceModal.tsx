@@ -25,22 +25,22 @@ export function EditDeviceModal({
   if (!device) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Edit GPS Device" maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="GPS төхөөрөмж засах" maxWidth="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
-          label="Device ID"
+          label="Төхөөрөмжийн ID"
           value={formData.deviceId}
           onChange={(e) => onChange({ deviceId: e.target.value })}
           required
-          placeholder="Enter device ID"
+          placeholder="Төхөөрөмжийн ID оруулна уу"
         />
 
-        <div className="flex gap-3 justify-end">
-          <Button type="button" variant="ghost" onClick={onClose}>
-            Cancel
+        <div className="flex gap-3 pt-4">
+          <Button type="button" variant="secondary" onClick={onClose} fullWidth>
+            Цуцлах
           </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Updating...' : 'Update Device'}
+          <Button type="submit" disabled={isLoading} variant="primary" fullWidth>
+            {isLoading ? 'Шинэчилж байна...' : 'Хадгалах'}
           </Button>
         </div>
       </form>
