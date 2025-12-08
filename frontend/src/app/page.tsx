@@ -93,29 +93,34 @@ const translations = {
     CN: '关于我们'
   },
   section1Subtitle: {
-    MN: 'Товч танилцуулга',
+    MN: 'Компанийн танилцуулга',
     EN: 'Company Overview',
     CN: '公司简介'
   },
   about1: {
-    MN: 'Манай компани 2021 онд БНХАУ-д байгуулагдаж, олон улсын тээвэр логистикийн салбарт цогц үйлчилгээ үзүүлж байна.',
-    EN: 'Our company was established in 2021 in China, delivering comprehensive international logistics services.',
-    CN: '我司成立于2021年，总部设立于中国，提供综合性国际物流服务。'
+    MN: 'Манай компани Бүгд Найрамдах Хятад Ард Улсад 2021 онд үүсгэн байгуулагдсанаас хойш олон улсын тээвэр зуучлал, логистикийн салбарт тогтвортой үйл ажиллагаа эрхэлж, бүс нутгийн хэмжээнд тээвэр зохион байгуулалт болон логистикийн цогц үйлчилгээг мэргэжлийн өндөр түвшинд үзүүлэн ажиллаж байна.',
+    EN: 'Since its establishment in 2021 in the People\'s Republic of China, our company has been continuously engaged in international freight forwarding and logistics, delivering professional regional transportation management and fully integrated logistics solutions.',
+    CN: '我司成立于2021年，总部设立于中华人民共和国，多年来持续深耕于国际货运代理与物流领域，为客户提供专业的区域运输管理服务及一体化综合物流解决方案。'
   },
   about2: {
-    MN: 'Манай баг авто зам, төмөр зам, агаарын болон далайн тээврийн уялдаа холбоотой сүлжээг ашиглан тээврийн шийдлийг мэргэжлийн түвшинд зохион байгуулдаг.',
-    EN: 'Our professional team manages transportation through integrated road, rail, air, and ocean logistics networks.',
-    CN: '我们整合公路、铁路、航空及海运资源，构建专业化多式联运体系。'
+    MN: 'Харилцагч, түнш байгууллагуудтайгаа итгэлцэлд суурилсан найдвартай хамтын ажиллагааг бүрдүүлсний үндсэн дээр 2025 оноос Монгол Улсад "Ачир Байрон ХХК" нэртэй салбар компаниа байгуулж, үйл ажиллагаагаа өргөжүүлэн явуулж байна.',
+    EN: 'Based on long-term trust earned from our clients and partners, we expanded our operations by establishing a subsidiary in Mongolia in 2025 under the name "Achir Bairon LLC."',
+    CN: '基于与客户及合作伙伴建立的长期互信关系，我司于2025年在蒙古国设立分公司，并以"Achir Bairon LLC"为名全面拓展业务。'
   },
   about3: {
-    MN: 'Бид чингэлэг тээвэр, агуулах, гааль болон door-to-door хүргэлтийг нэг цэгийн үйлчилгээгээр санал болгодог.',
-    EN: 'We provide container transportation, warehousing, customs clearance, and door-to-door delivery as a one-stop logistics service.',
-    CN: '公司提供集装箱运输、仓储服务、报关清关及门到门配送的一站式物流服务。'
+    MN: 'Бид дэлхий даяарх агентын өргөн сүлжээндээ тулгуурлан импорт, экспорт, дамжин өнгөрөх ачааны төмөр зам, далай, агаарын болон мультимодал тээвэрлэлтийн үйлчилгээг иж бүрнээр үзүүлдэг. Түүнчлэн авто замын тээвэрлэлтийг өөрийн эзэмшлийн тээврийн хэрэгсэл, техникээр гүйцэтгэдэг.',
+    EN: 'Leveraging our extensive global agent network, we provide comprehensive rail, ocean, air, and multimodal transportation services for import, export, and transit cargo. We also operate our own fleet of vehicles and equipment to provide road transportation services.',
+    CN: '依托覆盖全球的代理网络，我们为进出口及过境货物提供铁路、海运、空运及多式联运服务，同时配备自有车辆及运输设备，高效开展公路运输业务。'
   },
   about4: {
-    MN: 'Манай компанийн үйл ажиллагаа ISO 9001:2015, OHSAS 18001:2007 стандартын дагуу явагддаг.',
-    EN: 'Our operations comply with ISO 9001:2015 and OHSAS 18001:2007 international certifications.',
-    CN: '公司严格遵循 ISO 9001:2015 及 OHSAS 18001:2007 国际管理体系认证标准运行。'
+    MN: 'Манай компани ISO 9001:2015 болон OHSAS 18001:2007 олон улсын стандартуудыг бүрэн хэрэгжүүлж, аюулгүй ажиллагаа, үйлчилгээний чанарыг тогтмол сайжруулан ханган ажилладаг.',
+    EN: 'Our operations fully comply with international management standards, including ISO 9001:2015 (Quality Management System) and OHSAS 18001:2007 (Occupational Health and Safety Management System).',
+    CN: '公司严格遵循ISO 9001:2015 质量管理体系及OHSAS 18001:2007 职业健康安全管理体系等国际标准运行，持续提升安全管理水平与服务品质。'
+  },
+  about5: {
+    MN: 'Мэргэшсэн, туршлагатай манай баг нь таны ачааг найдвартай, хугацаанд нь хүргэхээс гадна, таны бизнесийн өсөлт, хөгжилд бодит дэмжлэг үзүүлэхэд чиглэн хамтран ажиллана.',
+    EN: 'Our highly skilled and experienced team ensures safe and timely cargo delivery, while actively supporting the sustainable growth and development of our clients\' businesses.',
+    CN: '凭借经验丰富的专业团队，我们不仅确保货物安全、准时交付，同时致力于为客户的业务成长与长期发展提供有力支持。'
   },
   section2Title: {
     MN: 'АЛСЫН ХАРАА',
@@ -123,9 +128,9 @@ const translations = {
     CN: '愿景'
   },
   vision: {
-    MN: 'Монголын логистикийн салбарт найдвартай, тэргүүлэгч тээврийн компани болох.',
-    EN: "To become Mongolia's most trusted and leading logistics service provider.",
-    CN: '成为蒙古国最具信誉和领先地位的物流服务商。'
+    MN: 'Монгол Улсаас дэлхийн зах зээлтэй холбосон, хамгийн найдвартай, хурдан, үр ашигтай логистикийн стратегийн түнш болж хөгжих.',
+    EN: 'To become Mongolia\'s most reliable, fastest, and most efficient strategic logistics partner connecting the country with global markets.',
+    CN: '立志发展成为连接蒙古与全球市场的最可靠、最高效、最具竞争力的战略物流合作伙伴。'
   },
   section3Title: {
     MN: 'ЭРХЭМ ЗОРИЛГО',
@@ -133,29 +138,29 @@ const translations = {
     CN: '使命'
   },
   mission: {
-    MN: 'Захиалагч бүрт тохирсон оновчтой тээврийн цогц шийдлийг санал болгох.',
-    EN: 'To deliver optimized and integrated logistics solutions tailored to each customer.',
-    CN: '为每位客户提供定制化、最优的一体化物流解决方案。'
+    MN: 'Авто зам, төмөр зам, агаарын болон мультимодал тээврийн уялдаа холбоотой сүлжээнд тулгуурлан, хэрэглэгч бүрийн хэрэгцээнд бүрэн нийцсэн оновчтой тээвэрлэлтийн шийдэл хүргэж, аюулгүй, шуурхай, чанартай үйлчилгээг тогтвортой үзүүлэх.',
+    EN: 'To deliver optimized, fully customized transportation solutions through integrated road, rail, air, and multimodal logistics networks, ensuring safe, efficient, and high-quality services.',
+    CN: '依托公路、铁路、航空及多式联运网络，为客户提供完全定制化、最优化的运输解决方案，保障物流服务的安全性、高效性与专业性。'
   },
   missionPoint1: {
-    MN: 'Зам, агаар, далай, төмөр замын сүлжээг хослуулан ашиглах',
-    EN: 'Integrating road, air, sea, and rail transportation networks',
-    CN: '整合公路、航空、海运及铁路运输网络'
+    MN: 'Хэрэглэгчийн хэрэгцээнд суурилсан оновчтой шийдэл',
+    EN: 'Tailored logistics solutions based on client needs',
+    CN: '基于客户需求定制化物流方案'
   },
   missionPoint2: {
-    MN: 'Аюулгүй, шуурхай, найдвартай хүргэлт хийх',
-    EN: 'Ensuring safe, fast, and reliable delivery',
-    CN: '确保安全、准时、可靠交付'
+    MN: 'Шуурхай харилцаа, ил тод мэдээлэл',
+    EN: 'Transparent and proactive communication',
+    CN: '主动沟通与信息透明化'
   },
   missionPoint3: {
-    MN: 'Real-time tracking хяналтын систем ашиглах',
-    EN: 'Implementing real-time tracking systems',
-    CN: '实施实时货物追踪系统'
+    MN: 'Уян хатан, шуурхай шийдвэр',
+    EN: 'Flexible and prompt decision-making',
+    CN: '灵活高效的决策机制'
   },
   missionPoint4: {
-    MN: 'Мэргэжлийн зөвлөгөө, бүрэн дэмжлэг үзүүлэх',
-    EN: 'Providing professional consulting and customer support',
-    CN: '提供专业咨询与全程客户支持'
+    MN: 'Урт хугацааны итгэлцэлд суурилсан түншлэл',
+    EN: 'Long-term partnership based on trust',
+    CN: '基于长期互信的合作模式'
   },
   section4Title: {
     MN: 'ҮНЭТ ЗҮЙЛС',
@@ -167,45 +172,75 @@ const translations = {
     EN: 'Reliability',
     CN: '可靠诚信'
   },
+  value1Desc: {
+    MN: 'Хүлээсэн үүргээ чанд мөрдөх',
+    EN: 'Fulfillment of commitments',
+    CN: '严格履行契约责任'
+  },
   value2: {
     MN: 'Хариуцлага',
     EN: 'Responsibility',
     CN: '责任担当'
+  },
+  value2Desc: {
+    MN: 'Ачааны бүрэн бүтэн байдлыг хангах',
+    EN: 'Ensuring cargo safety and integrity',
+    CN: '保障货物完整交付'
   },
   value3: {
     MN: 'Мэргэжлийн ур чадвар',
     EN: 'Professional Excellence',
     CN: '专业能力'
   },
+  value3Desc: {
+    MN: 'Олон улсын стандарт мөрдөх',
+    EN: 'Compliance with global standards',
+    CN: '遵循国际规范'
+  },
   value4: {
-    MN: 'Тасралтгүй хөгжил',
+    MN: 'Тасралтгүй сайжруулалт',
     EN: 'Continuous Improvement',
     CN: '持续提升'
   },
+  value4Desc: {
+    MN: 'Процессын тасралтгүй шинэчлэл',
+    EN: 'Continuous innovation',
+    CN: '持续优化提升'
+  },
   value5: {
-    MN: 'Зохион байгуулалт, шуурхай байдал',
-    EN: 'Efficiency & Organization',
-    CN: '高效组织'
+    MN: 'Шударга хамтын ажиллагаа',
+    EN: 'Fair Cooperation',
+    CN: '诚信合作'
+  },
+  value5Desc: {
+    MN: 'Урт хугацааны түншлэл хөгжүүлэх',
+    EN: 'Long-term partnerships',
+    CN: '构建长期战略合作'
   },
   section5Title: {
-    MN: 'АВТО ТЭЭВЭР',
+    MN: 'АВТО ЗАМЫН ТЭЭВЭР',
     EN: 'ROAD TRANSPORTATION',
     CN: '公路运输'
   },
   road1: {
-    MN: 'Гаалийн итгэмжлэгдсэн тээврийн хэрэгсэл',
-    EN: 'Customs-certified vehicles',
-    CN: '海关备案认证车辆'
+    MN: 'Итгэмжлэгдсэн тээврийн хэрэгсэл, мэргэшсэн жолооч, тогтмол маршрут',
+    EN: 'Certified fleet, professional drivers, stable routes',
+    CN: '海关备案车辆、持证司机、稳定运输线路'
   },
   road2: {
-    MN: 'Мэргэжлийн жолоочтой аюулгүй тээвэр',
-    EN: 'Safe transportation with licensed drivers',
-    CN: '持证司机安全运输'
+    MN: 'Хүнд даацын тээврийн хэрэгсэл: 15–50 тн',
+    EN: 'Heavy-duty vehicles: 15–50 tons',
+    CN: '重型卡车: 15–50 吨'
   },
   road3: {
-    MN: 'Тогтмол олон улсын маршрут',
-    EN: 'Regular international routes',
-    CN: '稳定国际运输线路'
+    MN: 'Хөнгөн, дунд даацын тээврийн хэрэгсэл: 1.2–5 тн',
+    EN: 'Light & medium vehicles: 1.2–5 tons',
+    CN: '轻中型货车: 1.2–5 吨'
+  },
+  road4: {
+    MN: 'Кран болон сэрээт өргөгч: 10 тн хүртэл',
+    EN: 'Crane trucks & forklifts: Up to 10 tons',
+    CN: '随车吊及叉车: 最大承重 10 吨'
   },
   section6Title: {
     MN: 'ТӨМӨР ЗАМЫН ТЭЭВЭР',
@@ -213,23 +248,23 @@ const translations = {
     CN: '铁路运输'
   },
   rail1: {
-    MN: 'Өртөг багатай',
-    EN: 'Cost-effective',
-    CN: '成本低'
+    MN: 'Өртөг багатай, цаг уурын нөлөөгүй',
+    EN: 'Cost-efficient, weather-independent',
+    CN: '成本低、不受天气影响'
   },
   rail2: {
-    MN: 'Цаг уурын нөлөөгүй',
-    EN: 'Weather-independent',
-    CN: '不受天气影响'
+    MN: 'Door-to-door үйлчилгээ',
+    EN: 'Door-to-door delivery',
+    CN: '门到门运输服务'
   },
   rail3: {
-    MN: 'Door-to-door үйлчилгээ',
-    EN: 'Door-to-door service',
-    CN: '门到门服务'
+    MN: 'Олон улсын маршрут',
+    EN: 'International routes',
+    CN: '国际运输线路'
   },
   section7Title: {
     MN: 'АГААРЫН ТЭЭВЭР',
-    EN: 'AIR TRANSPORTATION',
+    EN: 'AIR FREIGHT',
     CN: '航空运输'
   },
   air1: {
@@ -238,69 +273,104 @@ const translations = {
     CN: '最快捷运输方式'
   },
   air2: {
-    MN: 'Яаралтай ачигдахад тохиромжтой',
-    EN: 'Ideal for urgent shipments',
-    CN: '适用于紧急货物运输'
+    MN: 'Яаралтай болон өндөр үнэ цэнэтэй ачаанд тохиромжтой',
+    EN: 'Ideal for urgent and high-value cargo',
+    CN: '适用于紧急及高价值货物'
   },
   air3: {
-    MN: 'Incheon – дэлхийн маршрут',
-    EN: 'Global routes via Incheon airport',
-    CN: '经仁川机场连接全球航线'
+    MN: 'Дэлхийн маршрут',
+    EN: 'Global routes',
+    CN: '连接全球航线'
   },
   section8Title: {
     MN: 'МУЛЬТИМОДАЛ ТЭЭВЭР',
-    EN: 'MULTIMODAL TRANSPORT',
+    EN: 'MULTIMODAL TRANSPORTATION',
     CN: '多式联运'
   },
   multi1: {
-    MN: 'Далайн тээвэр – Тяньжин, Владивосток',
-    EN: 'Ocean freight – Tianjin & Vladivostok',
-    CN: '海运 – 天津港、符拉迪沃斯托克港'
+    MN: 'Tianjin & Vladivostok → Монгол',
+    EN: 'Tianjin & Vladivostok → Mongolia',
+    CN: '天津港、符拉迪沃斯托克 → 蒙古'
   },
   multi2: {
-    MN: 'Төмөр зам – Москва чиглэл',
-    EN: 'Rail transport via Moscow',
-    CN: '铁路 – 经莫斯科线路'
+    MN: 'FCL – Бүтэн чингэлэг тээвэр',
+    EN: 'FCL – Full Container Load',
+    CN: 'FCL – 整箱运输'
   },
   multi3: {
-    MN: 'Авто зам – Хил болон дотоод түгээлт',
-    EN: 'Road delivery for border & domestic distribution',
-    CN: '公路 – 边境及国内配送'
+    MN: 'Break Bulk – Том хэмжээний ачаа',
+    EN: 'Break Bulk – Oversized Cargo',
+    CN: '散杂大件货运输'
+  },
+  multi4: {
+    MN: 'Ro-Ro – Тээврийн хэрэгсэл, барилгын машин',
+    EN: 'Ro-Ro – Vehicles & Construction Equipment',
+    CN: '车辆及工程设备运输'
   },
   section9Title: {
     MN: 'НЭМЭЛТ ҮЙЛЧИЛГЭЭ',
-    EN: 'ADDITIONAL SERVICES',
+    EN: 'ANCILLARY SERVICES',
     CN: '增值服务'
   },
   service1: {
-    MN: 'Консолид тээвэр (LCL / LTL)',
-    EN: 'Cargo consolidation services (LCL / LTL)',
-    CN: '拼箱及零担服务（LCL / LTL）'
+    MN: 'Консолидаци (LCL/LTL)',
+    EN: 'Cargo consolidation (LCL/LTL)',
+    CN: '拼箱零担 (LCL/LTL)'
   },
   service2: {
-    MN: 'Импорт, экспортын гаалийн бүрдүүлэлт',
-    EN: 'Import & export customs clearance',
-    CN: '进出口清关服务'
+    MN: 'Гаалийн бүрдүүлэлт',
+    EN: 'Customs clearance',
+    CN: '专业清关代理'
   },
   service3: {
-    MN: 'Агуулах, бараа хадгалалт',
-    EN: 'Warehousing solutions',
+    MN: 'Агуулахын үйлчилгээ',
+    EN: 'Warehousing',
     CN: '仓储服务'
   },
   service4: {
-    MN: 'Real-time tracking хяналт',
-    EN: 'Real-time tracking monitoring',
-    CN: '实时追踪监控'
+    MN: 'Real-time tracking дэмжлэг',
+    EN: 'Real-time shipment tracking support',
+    CN: '提供货物实时追踪服务'
   },
   section10Title: {
     MN: 'ХОЛБОО БАРИХ',
-    EN: 'CONTACT',
+    EN: 'CONTACT INFORMATION',
     CN: '联系方式'
   },
+  customerPolicy: {
+    MN: 'ХАРИЛЦАГЧ ТӨВТЭЙ БОДЛОГО',
+    EN: 'CUSTOMER-CENTRIC POLICY',
+    CN: '客户中心政策'
+  },
+  policy1: {
+    MN: 'Хэрэглэгчийн хэрэгцээнд суурилсан оновчтой шийдэл',
+    EN: 'Tailored logistics solutions based on client needs',
+    CN: '基于客户需求定制化物流方案'
+  },
+  policy2: {
+    MN: 'Шуурхай харилцаа, ил тод мэдээлэл',
+    EN: 'Transparent and proactive communication',
+    CN: '主动沟通与信息透明化'
+  },
+  policy3: {
+    MN: 'Real-time tracking дэмжлэг',
+    EN: 'Real-time shipment tracking support',
+    CN: '提供货物实时追踪服务'
+  },
+  policy4: {
+    MN: 'Уян хатан, шуурхай шийдвэр',
+    EN: 'Flexible and prompt decision-making',
+    CN: '灵活高效的决策机制'
+  },
+  policy5: {
+    MN: 'Урт хугацааны итгэлцэл',
+    EN: 'Long-term partnership approach',
+    CN: '基于长期互信的合作模式'
+  },
   address: {
-    MN: 'Songinokhairkhan District, 9th Khoroo\nTransport Office Building, 60B\nUlaanbaatar, Mongolia',
-    EN: 'Songinokhairkhan District, 9th Khoroo\nTransport Office Building, 60B\nUlaanbaatar, Mongolia',
-    CN: 'Songinokhairkhan District, 9th Khoroo\nTransport Office Building, 60B\nUlaanbaatar, Mongolia'
+    MN: 'Монгол Улс, Улаанбаатар хот\nСүхбаатар дүүрэг, 9-р хороо\nХоймор оффис, 806 тоот',
+    EN: 'Khoymor Office, Suite 806\n9th Khoroo, Sukhbaatar District\nUlaanbaatar, Mongolia',
+    CN: '蒙古国 乌兰巴托市\n苏赫巴托区 第9分区\n怀默尔办公楼806室'
   }
 };
 
@@ -791,8 +861,9 @@ export default function LandingPage() {
                 <Phone className="w-7 h-7 text-white" />
               </div>
               <h4 className="font-semibold text-white mb-2 text-sm">Phone</h4>
-              <p className="text-white/70 text-xs">+976 95071104</p>
-              <p className="text-white/70 text-xs">+976 99152114</p>
+              <p className="text-white/70 text-xs">+976 99001240</p>
+              <p className="text-white/70 text-xs">+976 99132414</p>
+              <p className="text-white/70 text-xs">+86 15164989922</p>
             </div>
 
             <div className="text-center p-6 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors">
@@ -801,7 +872,7 @@ export default function LandingPage() {
               </div>
               <h4 className="font-semibold text-white mb-2 text-sm">Email</h4>
               <p className="text-white/70 text-xs">sales@achirbairon.mn</p>
-              <p className="text-white/70 text-xs">b.baterdene@achirbairon.mn</p>
+              <p className="text-white/70 text-xs">B.bat-erdene@achirbairon.mn</p>
             </div>
 
             <div className="text-center p-6 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors">
@@ -825,7 +896,7 @@ export default function LandingPage() {
               <div className="w-8 h-8 rounded-lg overflow-hidden">
                 <Image src="/logo.png" alt="Achir Bayron" width={32} height={32} className="object-cover" />
               </div>
-              <span className="text-white/60 text-sm">© 2024 Achir Bayron LLC. All rights reserved.</span>
+              <span className="text-white/60 text-sm">© 2025 Achir Bayron LLC. All rights reserved.</span>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-white/40 text-sm">Powered by Delivery Tracking System</span>
