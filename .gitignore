@@ -1,13 +1,34 @@
 # common
 .DS_Store
 .env
+.env.local
+.env.*.local
+
 # frontend
 frontend/node_modules
 frontend/.next
+frontend/out
+
 # backend
 backend/node_modules
 backend/dist
+
 # logs
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
+*.log
+
+# nginx ssl certificates (keep in separate secure location)
+nginx/ssl/*.pem
+nginx/ssl/*.key
+nginx/ssl/*.crt
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Docker volumes (local)
+postgres_data
