@@ -7,11 +7,13 @@ import { vehiclesApi } from '@/services/api';
 import api from '@/services/api';
 import { Truck, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
+import { useLanguage } from '@/context/LanguageProvider';
 import { PageHeader, Button, EmptyState } from '@/components/ui';
 import { CreateVehicleModal, CreateDeviceModal, VehicleCard, EditVehicleModal, EditDeviceModal } from './components';
 
 export default function VehiclesPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [showCreateVehicle, setShowCreateVehicle] = useState(false);
@@ -72,10 +74,10 @@ export default function VehiclesPage() {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       setShowCreateVehicle(false);
       setVehicleForm({ plateNo: '', driverName: '', driverPhone: '', deviceId: '' });
-      alert('✅ Тээврийн хэрэгсэл амжилттай үүсгэлээ!');
+      alert('✅ ' + t('vehicles.createSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Тээврийн хэрэгсэл үүсгэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('vehicles.createFailed')));
     },
   });
 
@@ -87,10 +89,10 @@ export default function VehiclesPage() {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       setShowCreateDevice(false);
       setDeviceForm({ deviceId: '' });
-      alert('✅ Төхөөрөмж амжилттай үүсгэлээ!');
+      alert('✅ ' + t('vehicles.deviceCreateSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Төхөөрөмж үүсгэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('vehicles.deviceCreateFailed')));
     },
   });
 
@@ -108,10 +110,10 @@ export default function VehiclesPage() {
       setShowEditVehicle(false);
       setEditingVehicle(null);
       setEditVehicleForm({ plateNo: '', driverName: '', driverPhone: '', deviceId: '' });
-      alert('✅ Тээврийн хэрэгсэл амжилттай шинэчлэгдлээ!');
+      alert('✅ ' + t('vehicles.updateSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Тээврийн хэрэгсэл шинэчлэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('vehicles.updateFailed')));
     },
   });
 
@@ -121,10 +123,10 @@ export default function VehiclesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-      alert('✅ Тээврийн хэрэгсэл амжилттай устгагдлаа!');
+      alert('✅ ' + t('vehicles.deleteSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Тээврийн хэрэгсэл устгах амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('vehicles.deleteFailed')));
     },
   });
 
@@ -137,10 +139,10 @@ export default function VehiclesPage() {
       setShowEditDevice(false);
       setEditingDevice(null);
       setEditDeviceForm({ deviceId: '' });
-      alert('✅ Төхөөрөмж амжилттай шинэчлэгдлээ!');
+      alert('✅ ' + t('vehicles.deviceUpdateSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Төхөөрөмж шинэчлэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('vehicles.deviceUpdateFailed')));
     },
   });
 
@@ -150,10 +152,10 @@ export default function VehiclesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
-      alert('✅ Төхөөрөмж амжилттай устгагдлаа!');
+      alert('✅ ' + t('vehicles.deviceDeleteSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Төхөөрөмж устгах амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('vehicles.deviceDeleteFailed')));
     },
   });
 
@@ -185,22 +187,22 @@ export default function VehiclesPage() {
   };
 
   const handleDeleteVehicle = (vehicle: any) => {
-    if (confirm(`"${vehicle.plateNo}" тээврийн хэрэгслийг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.`)) {
+    if (confirm(`"${vehicle.plateNo}" ${t('vehicles.deleteConfirm')}`)) {
       deleteVehicleMutation.mutate(vehicle.id);
     }
   };
 
   if (!user) {
-    router.push('/login');
+    router.push('/');
     return null;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader
-        icon={<Truck className="w-8 h-8 text-gray-700" />}
-        title="Тээврийн хэрэгсэл"
-        subtitle="Тээврийн хэрэгсэл болон GPS төхөөрөмж удирдлага"
+        icon={<Truck className="w-8 h-8 text-white" />}
+        title={t('vehicles.title')}
+        subtitle={t('vehicles.subtitle')}
         action={
           <div className="flex gap-2">
             {user.role === 'ADMIN' && (
@@ -209,7 +211,7 @@ export default function VehiclesPage() {
                 onClick={() => setShowCreateDevice(true)}
               >
                 <Plus className="w-5 h-5 mr-2" />
-                Шинэ төхөөрөмж
+                {t('vehicles.newDevice')}
               </Button>
             )}
             <Button
@@ -217,7 +219,7 @@ export default function VehiclesPage() {
               onClick={() => setShowCreateVehicle(true)}
             >
               <Plus className="w-5 h-5 mr-2" />
-              Шинэ тээврийн хэрэгсэл
+              {t('vehicles.newVehicle')}
             </Button>
           </div>
         }
@@ -296,9 +298,9 @@ export default function VehiclesPage() {
         ) : (
           <EmptyState
             icon={Truck}
-            title="Бүртгэлтэй тээврийн хэрэгсэл байхгүй"
-            description="Эхний тээврийн хэрэгслээ нэмж хяналт эхлүүлнэ үү"
-            actionLabel="Тээврийн хэрэгсэл нэмэх"
+            title={t('vehicles.noVehicles')}
+            description={t('vehicles.addFirstDesc')}
+            actionLabel={t('vehicles.add')}
             onAction={() => setShowCreateVehicle(true)}
           />
         )}

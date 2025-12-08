@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { UserPlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
+import { useLanguage } from '@/context/LanguageProvider';
 import api from '@/services/api';
 import { PageHeader, Button } from '@/components/ui';
 import { CreateUserModal, UserTable, EditUserModal } from './components';
@@ -10,6 +11,7 @@ import type { User, Company } from '@/types/types';
 
 export default function UsersPage() {
   const { user: currentUser } = useAuth();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export default function UsersPage() {
       setUsers(response.data);
     } catch (err: any) {
       console.error('Error fetching users:', err);
-      setError(err.response?.data?.error || 'Хэрэглэгчдийг татах амжилтгүй боллоо');
+      setError(err.response?.data?.error || t('users.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -72,12 +74,12 @@ export default function UsersPage() {
       };
 
       await api.post('/api/users', userData);
-      setSuccess('✅ Хэрэглэгч амжилттай үүсгэлээ!');
+      setSuccess('✅ ' + t('users.createSuccess'));
       setShowCreateModal(false);
       setFormData({ email: '', name: '', password: '', role: 'CLIENT_ADMIN', companyId: '' });
       fetchUsers();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Хэрэглэгч үүсгэх амжилтгүй боллоо');
+      setError(err.response?.data?.error || t('users.createFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -117,21 +119,21 @@ export default function UsersPage() {
 
       await api.put(`/api/users/${editingUser.id}`, userData);
       setSuccess(passwordData?.newPassword 
-        ? '✅ Хэрэглэгч болон нууц үг амжилттай шинэчлэгдлээ!' 
-        : '✅ Хэрэглэгч амжилттай шинэчлэгдлээ!');
+        ? '✅ ' + t('users.updateWithPasswordSuccess')
+        : '✅ ' + t('users.updateSuccess'));
       setShowEditModal(false);
       setEditingUser(null);
       setEditFormData({ email: '', name: '', role: 'CLIENT_ADMIN', companyId: '' });
       fetchUsers();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Хэрэглэгч шинэчлэх амжилтгүй боллоо');
+      setError(err.response?.data?.error || t('users.updateFailed'));
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDeleteUser = async (user: User) => {
-    if (!confirm(`"${user.name}" хэрэглэгчийг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.`)) {
+    if (!confirm(`"${user.name}" ${t('users.deleteConfirm')}`)) {
       return;
     }
 
@@ -140,10 +142,10 @@ export default function UsersPage() {
 
     try {
       await api.delete(`/api/users/${user.id}`);
-      setSuccess('✅ Хэрэглэгч амжилттай устгагдлаа!');
+      setSuccess('✅ ' + t('users.deleteSuccess'));
       fetchUsers();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Хэрэглэгч устгах амжилтгүй боллоо');
+      setError(err.response?.data?.error || t('users.deleteFailed'));
     }
   };
 
@@ -151,7 +153,7 @@ export default function UsersPage() {
     return (
       <div className="p-8">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          Хандах эрхгүй. Админ эрх шаардлагатай.
+          {t('users.accessDenied')}
         </div>
       </div>
     );
@@ -160,13 +162,13 @@ export default function UsersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader
-        icon={<UserPlus className="w-8 h-8 text-blue-600" />}
-        title="Хэрэглэгч удирдлага"
-        subtitle="Системийн хэрэглэгч болон эрх удирдлага"
+        icon={<UserPlus className="w-8 h-8 text-white" />}
+        title={t('users.title')}
+        subtitle={t('users.subtitle')}
         action={
           <Button onClick={() => setShowCreateModal(true)}>
             <UserPlus className="w-5 h-5 mr-2" />
-            Хэрэглэгч үүсгэх
+            {t('users.create')}
           </Button>
         }
       />

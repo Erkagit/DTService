@@ -7,11 +7,13 @@ import { ordersApi, vehiclesApi, companiesApi } from '@/services/api';
 import { Package, Truck, Building2, ArrowRight, MapPin, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthProvider';
+import { useLanguage } from '@/context/LanguageProvider';
 import { PageHeader, StatCard, EmptyState } from '@/components/ui';
 import { GoogleMap, GoogleMapsLoader } from './components';
 
 export default function DashboardPage() {
   const { user, logout, isLoading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const { data: orders, isLoading: ordersLoading } = useQuery({
@@ -53,13 +55,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login');
+      router.push('/');
     }
   }, [user, authLoading, router]);
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/');
   };
 
   if (authLoading || !user) {
@@ -67,7 +69,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Ачааллаж байна...</p>
+          <p className="mt-4 text-gray-600">{t('dashboard.loading')}</p>
         </div>
       </div>
     );
@@ -75,48 +77,48 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      label: 'Нийт захиалга',
+      label: t('dashboard.totalOrders'),
       value: orders?.length || 0,
       icon: Package,
       color: 'bg-blue-500',
       loading: ordersLoading,
       link: '/orders',
-      description: 'Идэвхтэй болон дууссан захиалга',
+      description: t('dashboard.activeCompletedOrders'),
     },
     ...(user.role === 'ADMIN' ? [{
-      label: 'Идэвхтэй тээврийн хэрэгсэл',
+      label: t('dashboard.activeVehicles'),
       value: vehicles?.length || 0,
       icon: Truck,
       color: 'bg-green-500',
       loading: vehiclesLoading,
       link: '/vehicles',
-      description: 'Ажиллаж байгаа хэрэгсэл',
+      description: t('dashboard.operatingVehicles'),
     }] : []),
   ];
 
   // Add Companies card for Admin users
   if (user.role === 'ADMIN') {
     stats.push({
-      label: 'Компаниуд',
+      label: t('nav.companies'),
       value: companies?.length || 0,
       icon: Building2,
       color: 'bg-purple-500',
       loading: companiesLoading,
       link: '/companies',
-      description: 'Бүртгэлтэй компаниуд',
+      description: t('dashboard.registeredCompanies'),
     });
   }
 
   // Add My Company card for CLIENT_ADMIN users
   if (user.role === 'CLIENT_ADMIN' && user.companyId) {
     stats.push({
-      label: 'Миний компани',
+      label: t('nav.myCompany'),
       value: 1,
       icon: Building2,
       color: 'bg-purple-500',
       loading: false,
       link: `/companies/${user.companyId}`,
-      description: 'Компанийн дэлгэрэнгүй',
+      description: t('dashboard.companyDetail'),
     });
   }
 
@@ -144,21 +146,23 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader
-        icon={<LayoutDashboard className="w-8 h-8 text-gray-600" />}
-        title="Хянах самбар"
-        subtitle="Хүргэлтийн системийн ерөнхий мэдээлэл"
+        icon={<LayoutDashboard className="w-8 h-8 text-white" />}
+        title={t('dashboard.title')}
+        subtitle={t('dashboard.subtitle')}
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
           {/* Google Map Section */}
-        <div className="mb-8 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
+        <div className="mb-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <MapPin className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-gray-900 rounded-xl">
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">Тээврийн хэрэгслийн байршил</h2>
-                <p className="text-sm text-gray-500 mt-1">Идэвхтэй захиалгуудын байршил</p>
+                <h2 className="text-xl font-bold text-gray-900">{t('dashboard.vehicleLocation')}</h2>
+                <p className="text-sm text-gray-500 mt-1">{t('dashboard.activeOrderLocations')}</p>
               </div>
             </div>
           </div>
@@ -185,17 +189,17 @@ export default function DashboardPage() {
       
 
         {/* Recent Orders */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Сүүлийн захиалгууд</h2>
-              <p className="text-sm text-gray-500 mt-1">Хамгийн сүүлд үүссэн захиалгууд</p>
+              <h2 className="text-xl font-bold text-gray-900">{t('dashboard.latestOrders')}</h2>
+              <p className="text-sm text-gray-500 mt-1">{t('dashboard.recentlyCreatedOrders')}</p>
             </div>
             <Link
               href="/orders"
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 hover:gap-2 transition-all"
+              className="text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1 hover:gap-2 transition-all"
             >
-              Бүгдийг харах
+              {t('dashboard.viewAll')}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -249,9 +253,9 @@ export default function DashboardPage() {
             ) : (
               <EmptyState
                 icon={Package}
-                title="Захиалга олдсонгүй"
-                description="Эхний захиалгаа үүсгэж эхлээрэй"
-                actionLabel="Эхний захиалга үүсгэх"
+                title={t('dashboard.noOrdersFound')}
+                description={t('dashboard.createFirstOrderDesc')}
+                actionLabel={t('dashboard.createFirstOrder')}
                 onAction={() => {}}
               />
             )}

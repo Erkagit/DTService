@@ -7,6 +7,7 @@ import { ordersApi, vehiclesApi, companiesApi } from '@/services/api';
 import { Package, Plus } from 'lucide-react';
 import { type OrderStatus } from '@/types/types';
 import { useAuth } from '@/context/AuthProvider';
+import { useLanguage } from '@/context/LanguageProvider';
 import api from '@/services/api';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
@@ -33,6 +34,7 @@ const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 
 export default function OrdersPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -108,10 +110,10 @@ export default function OrdersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       handleCloseCreateModal();
-      alert('✅ Захиалга амжилттай үүсгэлээ!');
+      alert('✅ ' + t('orders.createSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Захиалга үүсгэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('orders.createFailed')));
     },
   });
 
@@ -144,7 +146,7 @@ export default function OrdersPage() {
       if (context?.previousOrders) {
         queryClient.setQueryData(['orders'], context.previousOrders);
       }
-      alert('❌ ' + (error.response?.data?.error || 'Статус шинэчлэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('orders.statusUpdateFailed')));
     },
     onSuccess: () => {
       // Refetch to get the latest data from server
@@ -159,10 +161,10 @@ export default function OrdersPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      alert('✅ Захиалга амжилттай устгагдлаа!');
+      alert('✅ ' + t('orders.deleteSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Захиалга устгах амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('orders.deleteFailed')));
     },
   });
 
@@ -238,7 +240,7 @@ export default function OrdersPage() {
   };
 
   const handleQuickStatusUpdate = (order: any, newStatus: OrderStatus) => {
-    if (confirm(`Захиалга ${order.code}-ын статусыг ${newStatus.replace(/_/g, ' ')} болгон шинэчлэх үү?`)) {
+    if (confirm(`${order.code} ${t('orders.statusUpdateConfirm')} ${newStatus.replace(/_/g, ' ')}?`)) {
       updateStatusMutation.mutate({
         orderId: order.id,
         status: newStatus,
@@ -248,13 +250,13 @@ export default function OrdersPage() {
   };
 
   const handleDeleteOrder = (order: any) => {
-    if (confirm(`"${order.code}" захиалгыг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.`)) {
+    if (confirm(`"${order.code}" ${t('orders.deleteConfirm')}`)) {
       deleteOrderMutation.mutate(order.id);
     }
   };
 
   if (!user) {
-    router.push('/login');
+    router.push('/');
     return null;
   }
 
@@ -270,13 +272,13 @@ export default function OrdersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader
-        icon={<Package className="w-8 h-8 text-yellow-800" />}
-        title="Захиалга"
-        subtitle="Хүргэлтийн захиалга удирдлага"
+        icon={<Package className="w-8 h-8 text-white" />}
+        title={t('orders.title')}
+        subtitle={t('orders.subtitle')}
         action={
           user.role === 'ADMIN' ? (
             <Button icon={Plus} onClick={handleCreateClick}>
-              Шинэ захиалга
+              {t('orders.new')}
             </Button>
           ) : undefined
         }
@@ -322,9 +324,9 @@ export default function OrdersPage() {
             <section>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Идэвхтэй захиалгууд</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{t('orders.active')}</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    {activeOrders.length} захиалга үргэлжилж байна
+                    {activeOrders.length} {t('orders.inProgress')}
                   </p>
                 </div>
               </div>
@@ -346,7 +348,7 @@ export default function OrdersPage() {
               ) : (
                 <div className="bg-white rounded-lg border-2 border-dashed border-gray-200 p-8 text-center">
                   <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">Идэвхтэй захиалга байхгүй</p>
+                  <p className="text-gray-500">{t('orders.noActive')}</p>
                 </div>
               )}
             </section>
@@ -355,9 +357,9 @@ export default function OrdersPage() {
             <section>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Дууссан захиалгууд</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{t('orders.completed')}</h2>
                   <p className="text-sm text-gray-500 mt-1">
-                    {completedOrders.length} захиалга дууссан
+                    {completedOrders.length} {t('orders.orderCompleted')}
                   </p>
                 </div>
                 {completedOrders.length > 0 && (
@@ -365,7 +367,7 @@ export default function OrdersPage() {
                     variant="ghost"
                     onClick={() => setShowCompleted(!showCompleted)}
                   >
-                    {showCompleted ? 'Нуух' : 'Харуулах'}
+                    {showCompleted ? t('orders.hide') : t('orders.show')}
                   </Button>
                 )}
               </div>
@@ -389,14 +391,14 @@ export default function OrdersPage() {
               {!showCompleted && completedOrders.length > 0 && (
                 <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
                   <p className="text-gray-600">
-                    {completedOrders.length} дууссан захиалга нуугдсан
+                    {completedOrders.length} {t('orders.completedHidden')}
                   </p>
                   <Button
                     variant="ghost"
                     onClick={() => setShowCompleted(true)}
                     className="mt-3"
                   >
-                    Дууссан захиалга харуулах
+                    {t('orders.showCompleted')}
                   </Button>
                 </div>
               )}
@@ -405,9 +407,9 @@ export default function OrdersPage() {
         ) : (
           <EmptyState
             icon={Package}
-            title="Захиалга байхгүй байна"
-            description="Эхлээд захиалга үүсгэнэ үү"
-            actionLabel="Захиалга үүсгэх"
+            title={t('orders.noOrders')}
+            description={t('orders.createFirst')}
+            actionLabel={t('orders.create')}
             onAction={handleCreateClick}
           />
         )}

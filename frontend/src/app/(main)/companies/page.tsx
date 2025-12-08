@@ -7,11 +7,13 @@ import { companiesApi } from '@/services/api';
 import api from '@/services/api';
 import { Package, Building2, UserPlus, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
+import { useLanguage } from '@/context/LanguageProvider';
 import { PageHeader, Button, EmptyState } from '@/components/ui';
 import { CreateCompanyModal, CreateUserModal, CompanyCard, CompanyDetailsModal, EditCompanyModal } from './components';
 
 export default function CompaniesPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -52,10 +54,10 @@ export default function CompaniesPage() {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       setShowCreateForm(false);
       setFormData({ name: '' });
-      alert('✅ Компани амжилттай үүсгэлээ!');
+      alert('✅ ' + t('companies.createSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Компани үүсгэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('companies.createFailed')));
     },
   });
 
@@ -68,10 +70,10 @@ export default function CompaniesPage() {
       setShowCreateUserModal(false);
       setSelectedCompany(null);
       setUserFormData({ email: '', name: '', password: '' });
-      alert('✅ Харилцагчийн админ хэрэглэгч амжилттай үүсгэлээ!');
+      alert('✅ ' + t('companies.adminCreateSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Хэрэглэгч үүсгэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('companies.userCreateFailed')));
     },
   });
 
@@ -84,10 +86,10 @@ export default function CompaniesPage() {
       setShowEditModal(false);
       setEditingCompany(null);
       setEditFormData({ name: '' });
-      alert('✅ Компани амжилттай шинэчлэгдлээ!');
+      alert('✅ ' + t('companies.updateSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Компани шинэчлэх амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('companies.updateFailed')));
     },
   });
 
@@ -97,10 +99,10 @@ export default function CompaniesPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
-      alert('✅ Компани амжилттай устгагдлаа!');
+      alert('✅ ' + t('companies.deleteSuccess'));
     },
     onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Компани устгах амжилтгүй боллоо'));
+      alert('❌ ' + (error.response?.data?.error || t('companies.deleteFailed')));
     },
   });
 
@@ -132,7 +134,7 @@ export default function CompaniesPage() {
       setShowDetailsModal(true);
     } catch (error: any) {
       console.error('Error fetching company details:', error);
-      alert('❌ Компанийн мэдээлэл татах амжилтгүй боллоо');
+      alert('❌ ' + t('companies.fetchFailed'));
     }
   };
 
@@ -155,13 +157,13 @@ export default function CompaniesPage() {
   };
 
   const handleDeleteCompany = (company: any) => {
-    if (confirm(`"${company.name}"-г устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.`)) {
+    if (confirm(`"${company.name}" ${t('companies.deleteConfirm')}`)) {
       deleteCompanyMutation.mutate(company.id);
     }
   };
 
   if (!user) {
-    router.push('/login');
+    router.push('/');
     return null;
   }
 
@@ -169,8 +171,8 @@ export default function CompaniesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Хандах эрхгүй</h1>
-          <p className="text-gray-600 mb-4">Админ эрх шаардлагатай</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('companies.accessDenied')}</h1>
+          <p className="text-gray-600 mb-4">{t('companies.adminRequired')}</p>
         </div>
       </div>
     );
@@ -179,11 +181,12 @@ export default function CompaniesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader
-        icon={<Building2 className="w-8 h-8 text-purple-600" />}
-        title="Компаниуд"
+        icon={<Building2 className="w-8 h-8 text-white" />}
+        title={t('companies.title')}
+        subtitle={t('companies.subtitle')}
         action={
           <Button icon={Plus} onClick={() => setShowCreateForm(true)}>
-            Шинэ компани
+            {t('companies.new')}
           </Button>
         }
       />
@@ -250,9 +253,9 @@ export default function CompaniesPage() {
         ) : (
           <EmptyState
             icon={Building2}
-            title="Компани байхгүй байна"
-            description="Эхний компаниа үүсгэнэ үү"
-            actionLabel="Компани үүсгэх"
+            title={t('companies.noCompanies')}
+            description={t('companies.createFirst')}
+            actionLabel={t('companies.create')}
             onAction={() => setShowCreateForm(true)}
           />
         )}

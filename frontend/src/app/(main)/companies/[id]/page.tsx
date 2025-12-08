@@ -34,7 +34,7 @@ export default function CompanyDetailPage() {
   }, [user, companyId, router]);
 
   if (!user) {
-    router.push('/login');
+    router.push('/');
     return null;
   }
 

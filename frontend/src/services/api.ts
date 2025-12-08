@@ -39,12 +39,12 @@ api.interceptors.response.use(
   (error) => {
     console.error('API Error:', error.message, error.config?.url);
     
-    // Handle 401 Unauthorized - redirect to login
+    // Handle 401 Unauthorized - redirect to landing page
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        window.location.href = '/';
       }
     }
     
