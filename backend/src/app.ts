@@ -9,6 +9,7 @@ import { userRouter } from './routes/user';
 import { deviceRouter } from './routes/device';
 import { vehicleRouter } from './routes/vehicle';
 import { orderRouter } from './routes/order';
+import { preOrderRouter } from './routes/preorder';
 
 export const prisma = new PrismaClient();
 const app = express();
@@ -155,6 +156,7 @@ app.use('/api/users', userRouter);
 app.use('/api/devices', deviceRouter);
 app.use('/api/vehicles', vehicleRouter);
 app.use('/api/orders', orderRouter);
+app.use('/api/preorders', preOrderRouter);
 
 // 404
 app.use((req, res) => {

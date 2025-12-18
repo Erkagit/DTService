@@ -14,13 +14,14 @@ model Company {
   updatedAt DateTime @updatedAt
   users     User[]
   orders    Order[]
+  preOrders PreOrder[]
 }
 
 model User {
   id              Int       @id @default(autoincrement())
   email           String    @unique
   name            String
-  password        String?   // Password field (optional for backward compatibility)
+  password        String?   
   role            Role
   companyId       Int?
   company         Company?  @relation(fields: [companyId], references: [id])
@@ -73,6 +74,79 @@ model Order {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   statusHistory OrderStatusHistory[]
+  preOrders     PreOrder[]
+}
+
+// =====================
+// PreOrder Model - Урьдчилсан захиалга
+// =====================
+model PreOrder {
+  id        Int      @id @default(autoincrement())
+  
+  // 1. Order Note - Захиалгын тэмдэглэл
+  companyId       Int?      // Компани
+  company         Company?  @relation(fields: [companyId], references: [id])
+  pickupAddress   String?   // Ачаа авах хаяг
+  deliveryAddress String?   // Хүргэх хаяг
+  name            String    // Нэр
+  weight          Float?    // Жин (кг)
+  dimension       String?   // Хэмжээ
+  
+  // 2. Order Price - Үнэ
+  loadingCost         Float?  // Ачилт
+  transportCost       Float?  // Тээвэр
+  transshipmentCost   Float?  // Шилжүүлэн ачилт
+  exportCustomsCost   Float?  // Экспорт гааль
+  mongolTransportCost Float?  // Монгол тээвэр
+  importCustomsCost   Float?  // Импорт гааль
+  profit              Float?  // Ашиг
+  expense             Float?  // Зардал
+  totalAmount         Float?  // Нийт дүн
+  
+  // 3. Teever - Тээвэр
+  invoice             Boolean           @default(false)  // Invoice байгаа эсэх
+  packageList         Boolean           @default(false)  // Package list байгаа эсэх
+  originDoc           Boolean           @default(false)  // Origin байгаа эсэх
+  vehicleType         VehicleType       @default(DEFAULT)  // Машин төрөл
+  foreignVehicleCount Int?              // Гадаад машин тоо
+  mongolVehicleCount  Int?              // Монгол машиний тоо
+  trailerType         TrailerType?      // Чиргүүл төрөл
+  hasContainer        ContainerOption   @default(NO)  // Чингэлэг байгаа эсэх
+  containerNumber     String?           // Чингэлэгний дугаар (hasContainer = YES үед)
+  
+  // 4. Tulbur - Төлбөр
+  invoiceSent         Boolean           @default(false)  // Нэхэмжлэл явуулсан эсэх
+  paymentReceived     Boolean           @default(false)  // Төлбөр төлөгдсөн эсэх
+  idleTime            Boolean           @default(false)  // Сул зогсолт
+  transportDone       Boolean           @default(false)  // Тээвэр
+  
+  // Relations
+  orderId   Int?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Машин төрөл - Vehicle Type Enum
+enum VehicleType {
+  GIT       // Гит
+  DEFAULT   // Энгийн
+  TIR       // ТИР
+}
+
+// Чиргүүл төрөл - Trailer Type Enum
+enum TrailerType {
+  TENT      // Тент
+  HURGUUR   // Хүргүүр
+  ZADGAI    // Задгай
+  CHINGELEG // Чингэлэг
+}
+
+// Чингэлэг байгаа эсэх - Container Option Enum
+enum ContainerOption {
+  YES
+  NO
 }
 
 enum OrderStatus {
