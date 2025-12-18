@@ -163,6 +163,19 @@ export default function PreOrdersPage() {
 
   const isAdmin = user?.role === 'ADMIN';
 
+  // Only ADMIN can access this page
+  if (!isAdmin) {
+    return (
+      <div className="p-6">
+        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+          <FileBox className="w-16 h-16 mb-4 text-gray-300" />
+          <p className="text-lg">Хандах эрхгүй байна</p>
+          <p className="text-sm">Энэ хуудсыг зөвхөн админ хандах боломжтой</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <PageHeader
@@ -186,8 +199,6 @@ export default function PreOrdersPage() {
           icon={FileBox}
           title="Урьдчилсан захиалга байхгүй"
           description="Шинээр урьдчилсан захиалга үүсгэнэ үү"
-          actionLabel="Шинээр үүсгэх"
-          onAction={() => setShowCreateModal(true)}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">

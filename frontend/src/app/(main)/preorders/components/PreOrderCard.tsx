@@ -61,7 +61,7 @@ export function PreOrderCard({ preOrder, onView, onDelete }: PreOrderCardProps) 
         {preOrder.weight && (
           <div className="flex items-center gap-1 text-gray-600">
             <Package className="w-4 h-4" />
-            <span>{preOrder.weight} кг</span>
+            <span>{preOrder.weight} тн</span>
           </div>
         )}
         {preOrder.dimension && (
@@ -92,6 +92,22 @@ export function PreOrderCard({ preOrder, onView, onDelete }: PreOrderCardProps) 
         </span>
         <span className={`px-2 py-1 text-xs rounded ${preOrder.originDoc ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
           Origin {preOrder.originDoc ? '✓' : '✗'}
+        </span>
+      </div>
+
+      {/* Payment Checklist - Төлбөр */}
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <span className={`px-2 py-1 text-xs rounded text-center ${preOrder.invoiceSent ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+          Нэхэмжлэл {preOrder.invoiceSent ? '✓' : '✗'}
+        </span>
+        <span className={`px-2 py-1 text-xs rounded text-center ${preOrder.paymentReceived ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+          Төлбөр {preOrder.paymentReceived ? '✓' : '✗'}
+        </span>
+        <span className={`px-2 py-1 text-xs rounded text-center ${preOrder.idleTime ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+          Сул зогсолт {preOrder.idleTime ? '✓' : '✗'}
+        </span>
+        <span className={`px-2 py-1 text-xs rounded text-center ${preOrder.transportDone ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+          Тээвэр {preOrder.transportDone ? '✓' : '✗'}
         </span>
       </div>
 

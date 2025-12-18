@@ -231,7 +231,7 @@ export function CreatePreOrderModal({
 
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="Жин (кг)"
+          label="Жин (тн)"
           type="number"
           value={formData.weight}
           onChange={(e) => updateFormData('weight', e.target.value)}
@@ -590,7 +590,7 @@ export function CreatePreOrderModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Урьдчилсан захиалга үүсгэх">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Урьдчилсан захиалга үүсгэх" maxWidth="lg">
       <form onSubmit={handleSubmit}>
         {renderStepIndicator()}
         

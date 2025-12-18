@@ -25,7 +25,7 @@ export function CompanyDetailsModal({ isOpen, onClose, company }: CompanyDetails
   const orders = company.orders || [];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={company.name}>
+    <Modal isOpen={isOpen} onClose={onClose} title={company.name} maxWidth="lg">
       <div className="space-y-6">
         {/* Summary Stats */}
         <div className="grid grid-cols-2 gap-4">
