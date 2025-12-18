@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { User, Company, Vehicle, Order, LocationPing, Device } from '@/types/types';
+import type { User, Company, Vehicle, Order, LocationPing, Device, PreOrder } from '@/types/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
 
@@ -106,6 +106,14 @@ export const ordersApi = {
   update: (id: number, data: { code?: string; origin?: string; destination?: string; vehicleId?: number; status?: string }) =>
     api.put<Order>(`/api/orders/${id}`, data),
   delete: (id: number) => api.delete(`/api/orders/${id}`),
+};
+
+export const preOrdersApi = {
+  getAll: () => api.get<PreOrder[]>('/api/preorders'),
+  getById: (id: number) => api.get<PreOrder>(`/api/preorders/${id}`),
+  create: (data: Partial<PreOrder>) => api.post<PreOrder>('/api/preorders', data),
+  update: (id: number, data: Partial<PreOrder>) => api.put<PreOrder>(`/api/preorders/${id}`, data),
+  delete: (id: number) => api.delete(`/api/preorders/${id}`),
 };
 
 export default api;

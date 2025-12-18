@@ -123,6 +123,69 @@ export interface Order {
 }
 
 // ============================================
+// PRE-ORDER TYPES & ENUMS
+// ============================================
+
+export type VehicleType = 'GIT' | 'DEFAULT' | 'TIR';
+export type TrailerType = 'TENT' | 'HURGUUR' | 'ZADGAI' | 'CHINGELEG';
+export type ContainerOption = 'YES' | 'NO';
+
+export const VEHICLE_TYPE_LABELS: Record<VehicleType, string> = {
+  GIT: 'Гит',
+  DEFAULT: 'Энгийн',
+  TIR: 'ТИР',
+};
+
+export const TRAILER_TYPE_LABELS: Record<TrailerType, string> = {
+  TENT: 'Тент',
+  HURGUUR: 'Хүргүүр',
+  ZADGAI: 'Задгай',
+  CHINGELEG: 'Чингэлэг',
+};
+
+export interface PreOrder {
+  id: number;
+  // Order Note
+  companyId: number | null;
+  company?: Company;
+  pickupAddress: string | null;
+  deliveryAddress: string | null;
+  name: string;
+  weight: number | null;
+  dimension: string | null;
+  // Order Price
+  loadingCost: number | null;
+  transportCost: number | null;
+  transshipmentCost: number | null;
+  exportCustomsCost: number | null;
+  mongolTransportCost: number | null;
+  importCustomsCost: number | null;
+  profit: number | null;
+  expense: number | null;
+  totalAmount: number | null;
+  // Teever
+  invoice: boolean;
+  packageList: boolean;
+  originDoc: boolean;
+  vehicleType: VehicleType;
+  foreignVehicleCount: number | null;
+  mongolVehicleCount: number | null;
+  trailerType: TrailerType | null;
+  hasContainer: ContainerOption;
+  containerNumber: string | null;
+  // Tulbur - Төлбөр
+  invoiceSent: boolean;
+  paymentReceived: boolean;
+  idleTime: boolean;
+  transportDone: boolean;
+  // Relations
+  orderId: number | null;
+  order?: Order;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================
 // COMPONENT PROPS INTERFACES
 // ============================================
 

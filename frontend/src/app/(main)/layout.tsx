@@ -14,7 +14,8 @@ import {
   LogOut,
   Menu,
   X,
-  Globe
+  Globe,
+  FileBox
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -43,6 +44,7 @@ export default function MainLayout({
   const navigation = [
     { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'CLIENT_ADMIN'] },
     { nameKey: 'nav.orders', href: '/orders', icon: Package, roles: ['ADMIN', 'CLIENT_ADMIN'] },
+    { nameKey: 'nav.preOrders', href: '/preorders', icon: FileBox, roles: ['ADMIN', 'CLIENT_ADMIN'] },
     { nameKey: 'nav.vehicles', href: '/vehicles', icon: Truck, roles: ['ADMIN'] },
     { nameKey: 'nav.companies', href: '/companies', icon: Building2, roles: ['ADMIN'] },
     { nameKey: 'nav.users', href: '/users', icon: Users, roles: ['ADMIN'] },

@@ -17,6 +17,7 @@ const translations: Record<string, Record<Language, string>> = {
   // SIDEBAR / NAVIGATION
   'nav.dashboard': { MN: 'Хянах самбар', EN: 'Dashboard', CN: '仪表盘' },
   'nav.orders': { MN: 'Захиалга', EN: 'Orders', CN: '订单' },
+  'nav.preOrders': { MN: 'Урьдчилсан захиалга', EN: 'Pre-Orders', CN: '预订单' },
   'nav.vehicles': { MN: 'Тээврийн хэрэгсэл', EN: 'Vehicles', CN: '运输车辆' },
   'nav.companies': { MN: 'Компаниуд', EN: 'Companies', CN: '公司' },
   'nav.users': { MN: 'Хэрэглэгчид', EN: 'Users', CN: '用户' },

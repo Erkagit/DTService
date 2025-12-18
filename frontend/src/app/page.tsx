@@ -138,9 +138,9 @@ const translations = {
     CN: '使命'
   },
   mission: {
-    MN: 'Авто зам, төмөр зам, агаарын болон мультимодал тээврийн уялдаа холбоотой сүлжээнд тулгуурлан, хэрэглэгч бүрийн хэрэгцээнд бүрэн нийцсэн оновчтой тээвэрлэлтийн шийдэл хүргэж, аюулгүй, шуурхай, чанартай үйлчилгээг тогтвортой үзүүлэх.',
-    EN: 'To deliver optimized, fully customized transportation solutions through integrated road, rail, air, and multimodal logistics networks, ensuring safe, efficient, and high-quality services.',
-    CN: '依托公路、铁路、航空及多式联运网络，为客户提供完全定制化、最优化的运输解决方案，保障物流服务的安全性、高效性与专业性。'
+    MN: '',
+    EN: '',
+    CN: '',
   },
   missionPoint1: {
     MN: 'Хэрэглэгчийн хэрэгцээнд суурилсан оновчтой шийдэл',
@@ -899,7 +899,7 @@ export default function LandingPage() {
               <span className="text-white/60 text-sm">© 2025 Achir Bayron LLC. All rights reserved.</span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-white/40 text-sm">Powered by Delivery Tracking System</span>
+              <span className="text-white/40 text-sm">Powered by Erka Gantsaaraa</span>
             </div>
           </div>
         </div>
