@@ -1,6 +1,8 @@
 {
-  "buildCommand": "npm install",
+  "buildCommand": "prisma generate",
+  "installCommand": "npm install",
   "outputDirectory": ".",
+  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
