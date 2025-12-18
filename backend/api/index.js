@@ -32,6 +32,11 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'DTS Backend API', status: 'running', timestamp: new Date().toISOString() });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
