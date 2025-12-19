@@ -250,6 +250,8 @@ app.delete('/api/vehicles/:id', async (req, res) => {
     
     // Delete related orders
     await getPrisma().order.deleteMany({ where: { vehicleId } });
+    // Delete location pings
+    await getPrisma().locationPing.deleteMany({ where: { vehicleId } });
     // Delete the vehicle
     await getPrisma().vehicle.delete({ where: { id: vehicleId } });
     res.json({ success: true });
