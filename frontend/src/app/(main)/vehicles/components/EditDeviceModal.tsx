@@ -25,7 +25,7 @@ export function EditDeviceModal({
   if (!device) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="GPS төхөөрөмж засах" maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="GPS төхөөрөмж засах" maxWidth="form">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Төхөөрөмжийн ID"

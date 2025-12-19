@@ -14,7 +14,7 @@ export function CreateVehicleModal({
   isLoading,
 }: CreateVehicleModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ тээврийн хэрэгсэл нэмэх" maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ тээврийн хэрэгсэл нэмэх" maxWidth="form">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Улсын дугаар"

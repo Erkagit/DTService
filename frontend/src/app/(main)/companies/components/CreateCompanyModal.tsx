@@ -12,7 +12,7 @@ export function CreateCompanyModal({
   isLoading,
 }: CreateCompanyModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ компани үүсгэх" maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ компани үүсгэх" maxWidth="form">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Компанийн нэр"

@@ -6,10 +6,10 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'form';
 }
 
-export function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, maxWidth = 'form' }: ModalProps) {
   if (!isOpen) return null;
 
   const widthClass = {
@@ -20,6 +20,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: Mod
     '2xl': 'max-w-2xl',
     '3xl': 'max-w-3xl',
     '4xl': 'max-w-4xl',
+    'form': 'max-w-[640px]',
   }[maxWidth];
 
   return (

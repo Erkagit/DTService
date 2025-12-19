@@ -15,7 +15,7 @@ export function CreateUserModal({
   if (!company) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`${company.name}-д харилцагчийн админ үүсгэх`} maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title={`${company.name}-д харилцагчийн админ үүсгэх`} maxWidth="form">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Нэр"

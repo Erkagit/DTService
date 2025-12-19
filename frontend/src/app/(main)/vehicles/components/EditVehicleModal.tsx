@@ -33,7 +33,7 @@ export function EditVehicleModal({
   if (!vehicle) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Тээврийн хэрэгсэл засах" maxWidth="md">
+    <Modal isOpen={isOpen} onClose={onClose} title="Тээврийн хэрэгсэл засах" maxWidth="form">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Улсын дугаар"

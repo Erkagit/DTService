@@ -590,7 +590,7 @@ export function CreatePreOrderModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Урьдчилсан захиалга үүсгэх" maxWidth="lg">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Урьдчилсан захиалга үүсгэх" maxWidth="form">
       <form onSubmit={handleSubmit}>
         {renderStepIndicator()}
         
