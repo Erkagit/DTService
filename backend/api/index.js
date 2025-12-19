@@ -19,11 +19,31 @@ const app = express();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dts-super-secret-key-production-2025';
 
-// Middleware
+// CORS configuration - Allow specific origins
+const allowedOrigins = [
+  'https://www.achirbairon.mn',
+  'https://achirbairon.mn',
+  'http://localhost:3000',
+  'http://localhost:3001',
+];
+
 app.use(cors({
-  origin: true,
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Allow all for now
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 
 // Auth middleware
