@@ -634,16 +634,12 @@ export default function LandingPage() {
                     <div className="w-full border-t border-gray-200" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-3 bg-white text-gray-500">
-                      {lang === 'MN' ? 'Туршилтын мэдээлэл' : lang === 'CN' ? '测试账号' : 'Test Credentials'}
-                    </span>
                   </div>
                 </div>
 
                 {/* Test Credentials */}
                 <div className="bg-gray-50 rounded-xl p-4 text-center">
                   <p className="text-xs text-gray-500 mb-2">
-                    {lang === 'MN' ? 'Админ эрхээр нэвтрэх:' : lang === 'CN' ? '管理员登录：' : 'Admin login:'}
                   </p>
                   <p className="text-sm font-mono text-gray-700">admin@dts.local / password123</p>
                 </div>
