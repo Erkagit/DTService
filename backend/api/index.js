@@ -1,19 +1,8 @@
 // Vercel Serverless Function Entry Point
 const express = require('express');
 const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
-// Initialize Prisma with error handling
-let prisma;
-try {
-  prisma = new PrismaClient({
-    log: ['error', 'warn'],
-  });
-} catch (error) {
-  console.error('Failed to initialize Prisma:', error);
-}
 
 const app = express();
 
@@ -46,6 +35,16 @@ app.options('*', cors());
 
 app.use(express.json());
 
+// Initialize Prisma lazily
+let prisma = null;
+const getPrisma = () => {
+  if (!prisma) {
+    const { PrismaClient } = require('@prisma/client');
+    prisma = new PrismaClient();
+  }
+  return prisma;
+};
+
 // Auth middleware
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
@@ -65,7 +64,7 @@ const authMiddleware = (req, res, next) => {
 app.get('/', async (req, res) => {
   try {
     // Test database connection
-    await prisma.$queryRaw`SELECT 1`;
+    await getPrisma().$queryRaw`SELECT 1`;
     res.json({ 
       message: 'DTS Backend API', 
       status: 'running', 
@@ -86,7 +85,7 @@ app.get('/', async (req, res) => {
 // Health check
 app.get('/health', async (req, res) => {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await getPrisma().$queryRaw`SELECT 1`;
     res.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString() });
   } catch (error) {
     res.status(500).json({ status: 'error', database: 'disconnected', error: error.message });
@@ -99,7 +98,7 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     console.log('Login attempt:', email);
     
-    const user = await prisma.user.findFirst({
+    const user = await getPrisma().user.findFirst({
       where: { OR: [{ email }, { name: email }] },
       include: { company: true }
     });
@@ -132,17 +131,17 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Companies
 app.get('/api/companies', async (req, res) => {
-  const companies = await prisma.company.findMany({ include: { users: true } });
+  const companies = await getPrisma().company.findMany({ include: { users: true } });
   res.json(companies);
 });
 
 app.post('/api/companies', async (req, res) => {
-  const company = await prisma.company.create({ data: req.body });
+  const company = await getPrisma().company.create({ data: req.body });
   res.json(company);
 });
 
 app.put('/api/companies/:id', async (req, res) => {
-  const company = await prisma.company.update({
+  const company = await getPrisma().company.update({
     where: { id: parseInt(req.params.id) },
     data: req.body
   });
@@ -152,13 +151,13 @@ app.put('/api/companies/:id', async (req, res) => {
 app.delete('/api/companies/:id', async (req, res) => {
   try {
     // First delete related users
-    await prisma.user.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    await getPrisma().user.deleteMany({ where: { companyId: parseInt(req.params.id) } });
     // Delete related orders
-    await prisma.order.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    await getPrisma().order.deleteMany({ where: { companyId: parseInt(req.params.id) } });
     // Delete related preorders
-    await prisma.preOrder.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    await getPrisma().preOrder.deleteMany({ where: { companyId: parseInt(req.params.id) } });
     // Then delete company
-    await prisma.company.delete({ where: { id: parseInt(req.params.id) } });
+    await getPrisma().company.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete company error:', error);
@@ -168,7 +167,7 @@ app.delete('/api/companies/:id', async (req, res) => {
 
 // Users
 app.get('/api/users', async (req, res) => {
-  const users = await prisma.user.findMany({ include: { company: true } });
+  const users = await getPrisma().user.findMany({ include: { company: true } });
   const usersWithoutPasswords = users.map(({ password, ...user }) => user);
   res.json(usersWithoutPasswords);
 });
@@ -176,7 +175,7 @@ app.get('/api/users', async (req, res) => {
 app.post('/api/users', async (req, res) => {
   const { password, ...data } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
+  const user = await getPrisma().user.create({
     data: { ...data, password: hashedPassword },
     include: { company: true }
   });
@@ -187,7 +186,7 @@ app.post('/api/users', async (req, res) => {
 app.put('/api/users/:id', async (req, res) => {
   const { password, ...data } = req.body;
   const updateData = password ? { ...data, password: await bcrypt.hash(password, 10) } : data;
-  const user = await prisma.user.update({
+  const user = await getPrisma().user.update({
     where: { id: parseInt(req.params.id) },
     data: updateData,
     include: { company: true }
@@ -198,7 +197,7 @@ app.put('/api/users/:id', async (req, res) => {
 
 app.delete('/api/users/:id', async (req, res) => {
   try {
-    await prisma.user.delete({ where: { id: parseInt(req.params.id) } });
+    await getPrisma().user.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete user error:', error);
@@ -208,17 +207,17 @@ app.delete('/api/users/:id', async (req, res) => {
 
 // Vehicles
 app.get('/api/vehicles', async (req, res) => {
-  const vehicles = await prisma.vehicle.findMany({ include: { device: true, orders: true } });
+  const vehicles = await getPrisma().vehicle.findMany({ include: { device: true, orders: true } });
   res.json(vehicles);
 });
 
 app.post('/api/vehicles', async (req, res) => {
-  const vehicle = await prisma.vehicle.create({ data: req.body });
+  const vehicle = await getPrisma().vehicle.create({ data: req.body });
   res.json(vehicle);
 });
 
 app.put('/api/vehicles/:id', async (req, res) => {
-  const vehicle = await prisma.vehicle.update({
+  const vehicle = await getPrisma().vehicle.update({
     where: { id: parseInt(req.params.id) },
     data: req.body
   });
@@ -228,9 +227,9 @@ app.put('/api/vehicles/:id', async (req, res) => {
 app.delete('/api/vehicles/:id', async (req, res) => {
   try {
     // Delete related orders first
-    await prisma.order.deleteMany({ where: { vehicleId: parseInt(req.params.id) } });
+    await getPrisma().order.deleteMany({ where: { vehicleId: parseInt(req.params.id) } });
     // Delete the vehicle
-    await prisma.vehicle.delete({ where: { id: parseInt(req.params.id) } });
+    await getPrisma().vehicle.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete vehicle error:', error);
@@ -240,17 +239,17 @@ app.delete('/api/vehicles/:id', async (req, res) => {
 
 // Devices
 app.get('/api/devices', async (req, res) => {
-  const devices = await prisma.device.findMany({ include: { vehicle: true } });
+  const devices = await getPrisma().device.findMany({ include: { vehicle: true } });
   res.json(devices);
 });
 
 app.post('/api/devices', async (req, res) => {
-  const device = await prisma.device.create({ data: req.body });
+  const device = await getPrisma().device.create({ data: req.body });
   res.json(device);
 });
 
 app.put('/api/devices/:id', async (req, res) => {
-  const device = await prisma.device.update({
+  const device = await getPrisma().device.update({
     where: { id: parseInt(req.params.id) },
     data: req.body
   });
@@ -260,11 +259,11 @@ app.put('/api/devices/:id', async (req, res) => {
 app.delete('/api/devices/:id', async (req, res) => {
   try {
     // Unlink from vehicle first
-    await prisma.vehicle.updateMany({ 
+    await getPrisma().vehicle.updateMany({ 
       where: { deviceId: parseInt(req.params.id) },
       data: { deviceId: null }
     });
-    await prisma.device.delete({ where: { id: parseInt(req.params.id) } });
+    await getPrisma().device.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete device error:', error);
@@ -274,7 +273,7 @@ app.delete('/api/devices/:id', async (req, res) => {
 
 // Orders
 app.get('/api/orders', async (req, res) => {
-  const orders = await prisma.order.findMany({
+  const orders = await getPrisma().order.findMany({
     include: { company: true, vehicle: true },
     orderBy: { createdAt: 'desc' }
   });
@@ -282,7 +281,7 @@ app.get('/api/orders', async (req, res) => {
 });
 
 app.post('/api/orders', async (req, res) => {
-  const order = await prisma.order.create({
+  const order = await getPrisma().order.create({
     data: req.body,
     include: { company: true, vehicle: true }
   });
@@ -291,7 +290,7 @@ app.post('/api/orders', async (req, res) => {
 
 app.put('/api/orders/:id', async (req, res) => {
   try {
-    const order = await prisma.order.update({
+    const order = await getPrisma().order.update({
       where: { id: parseInt(req.params.id) },
       data: req.body,
       include: { company: true, vehicle: true }
@@ -310,14 +309,14 @@ app.patch('/api/orders/:id/status', async (req, res) => {
     const orderId = parseInt(req.params.id);
     
     // Update the order status
-    const order = await prisma.order.update({
+    const order = await getPrisma().order.update({
       where: { id: orderId },
       data: { status },
       include: { company: true, vehicle: true }
     });
     
     // Create status history entry
-    await prisma.orderStatusHistory.create({
+    await getPrisma().orderStatusHistory.create({
       data: {
         orderId,
         status,
@@ -338,8 +337,8 @@ app.patch('/api/orders/:id/status', async (req, res) => {
 app.delete('/api/orders/:id', async (req, res) => {
   try {
     // Delete order status history first
-    await prisma.orderStatusHistory.deleteMany({ where: { orderId: parseInt(req.params.id) } });
-    await prisma.order.delete({ where: { id: parseInt(req.params.id) } });
+    await getPrisma().orderStatusHistory.deleteMany({ where: { orderId: parseInt(req.params.id) } });
+    await getPrisma().order.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete order error:', error);
@@ -349,7 +348,7 @@ app.delete('/api/orders/:id', async (req, res) => {
 
 // PreOrders
 app.get('/api/preorders', async (req, res) => {
-  const preOrders = await prisma.preOrder.findMany({
+  const preOrders = await getPrisma().preOrder.findMany({
     include: { company: true },
     orderBy: { createdAt: 'desc' }
   });
@@ -357,7 +356,7 @@ app.get('/api/preorders', async (req, res) => {
 });
 
 app.post('/api/preorders', async (req, res) => {
-  const preOrder = await prisma.preOrder.create({
+  const preOrder = await getPrisma().preOrder.create({
     data: req.body,
     include: { company: true }
   });
@@ -365,7 +364,7 @@ app.post('/api/preorders', async (req, res) => {
 });
 
 app.put('/api/preorders/:id', async (req, res) => {
-  const preOrder = await prisma.preOrder.update({
+  const preOrder = await getPrisma().preOrder.update({
     where: { id: parseInt(req.params.id) },
     data: req.body,
     include: { company: true }
@@ -375,7 +374,7 @@ app.put('/api/preorders/:id', async (req, res) => {
 
 app.delete('/api/preorders/:id', async (req, res) => {
   try {
-    await prisma.preOrder.delete({ where: { id: parseInt(req.params.id) } });
+    await getPrisma().preOrder.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete preorder error:', error);
