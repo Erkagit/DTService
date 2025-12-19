@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const prisma = new PrismaClient();
 const app = express();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'dts-super-secret-key-production-2025';
 
 // Middleware
 app.use(cors({
