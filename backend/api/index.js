@@ -5,7 +5,16 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const prisma = new PrismaClient();
+// Initialize Prisma with error handling
+let prisma;
+try {
+  prisma = new PrismaClient({
+    log: ['error', 'warn'],
+  });
+} catch (error) {
+  console.error('Failed to initialize Prisma:', error);
+}
+
 const app = express();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dts-super-secret-key-production-2025';
@@ -33,13 +42,35 @@ const authMiddleware = (req, res, next) => {
 };
 
 // Root route
-app.get('/', (req, res) => {
-  res.json({ message: 'DTS Backend API', status: 'running', timestamp: new Date().toISOString() });
+app.get('/', async (req, res) => {
+  try {
+    // Test database connection
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ 
+      message: 'DTS Backend API', 
+      status: 'running', 
+      database: 'connected',
+      timestamp: new Date().toISOString() 
+    });
+  } catch (error) {
+    res.json({ 
+      message: 'DTS Backend API', 
+      status: 'running', 
+      database: 'error',
+      error: error.message,
+      timestamp: new Date().toISOString() 
+    });
+  }
 });
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/health', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: 'ok', database: 'connected', timestamp: new Date().toISOString() });
+  } catch (error) {
+    res.status(500).json({ status: 'error', database: 'disconnected', error: error.message });
+  }
 });
 
 // Login
