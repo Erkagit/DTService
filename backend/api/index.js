@@ -150,14 +150,25 @@ app.put('/api/companies/:id', async (req, res) => {
 
 app.delete('/api/companies/:id', async (req, res) => {
   try {
-    // First delete related users
-    await getPrisma().user.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    const companyId = parseInt(req.params.id);
+    
+    // Get all orders for this company to delete their status history
+    const orders = await getPrisma().order.findMany({ where: { companyId }, select: { id: true } });
+    const orderIds = orders.map(o => o.id);
+    
+    // Delete order status history first
+    if (orderIds.length > 0) {
+      await getPrisma().orderStatusHistory.deleteMany({ where: { orderId: { in: orderIds } } });
+    }
+    
     // Delete related orders
-    await getPrisma().order.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    await getPrisma().order.deleteMany({ where: { companyId } });
     // Delete related preorders
-    await getPrisma().preOrder.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    await getPrisma().preOrder.deleteMany({ where: { companyId } });
+    // Delete related users
+    await getPrisma().user.deleteMany({ where: { companyId } });
     // Then delete company
-    await getPrisma().company.delete({ where: { id: parseInt(req.params.id) } });
+    await getPrisma().company.delete({ where: { id: companyId } });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete company error:', error);
@@ -226,10 +237,21 @@ app.put('/api/vehicles/:id', async (req, res) => {
 
 app.delete('/api/vehicles/:id', async (req, res) => {
   try {
-    // Delete related orders first
-    await getPrisma().order.deleteMany({ where: { vehicleId: parseInt(req.params.id) } });
+    const vehicleId = parseInt(req.params.id);
+    
+    // Get all orders for this vehicle to delete their status history
+    const orders = await getPrisma().order.findMany({ where: { vehicleId }, select: { id: true } });
+    const orderIds = orders.map(o => o.id);
+    
+    // Delete order status history first
+    if (orderIds.length > 0) {
+      await getPrisma().orderStatusHistory.deleteMany({ where: { orderId: { in: orderIds } } });
+    }
+    
+    // Delete related orders
+    await getPrisma().order.deleteMany({ where: { vehicleId } });
     // Delete the vehicle
-    await getPrisma().vehicle.delete({ where: { id: parseInt(req.params.id) } });
+    await getPrisma().vehicle.delete({ where: { id: vehicleId } });
     res.json({ success: true });
   } catch (error) {
     console.error('Delete vehicle error:', error);
