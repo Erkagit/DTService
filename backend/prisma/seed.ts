@@ -95,7 +95,7 @@ async function main() {
       vehicleId: vehicle1.id,
       status: OrderStatus.IN_TRANSIT,
       createdById: admin.id,
-      assignedToId: operator.id,
+      assignedToId: admin.id,
     },
   });
 
@@ -118,7 +118,7 @@ async function main() {
       vehicleId: vehicle2.id,
       status: OrderStatus.LOADING,
       createdById: admin.id,
-      assignedToId: operator.id,
+      assignedToId: admin.id,
     },
   });
 
@@ -146,7 +146,6 @@ async function main() {
   console.log('\n🎉 Seed completed successfully!\n');
   console.log('🔐 Login credentials (password: password123):');
   console.log('  - admin@dts.local (Admin)');
-  console.log('  - op@dts.local (Operator)');
   console.log('  - client@acme.local (Client Admin)\n');
 }
 
