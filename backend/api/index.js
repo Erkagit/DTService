@@ -46,17 +46,21 @@ app.get('/health', (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('Login attempt:', email);
+    
     const user = await prisma.user.findFirst({
       where: { OR: [{ email }, { name: email }] },
       include: { company: true }
     });
     
     if (!user) {
+      console.log('User not found:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
+      console.log('Invalid password for:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
@@ -66,10 +70,12 @@ app.post('/api/auth/login', async (req, res) => {
       { expiresIn: '7d' }
     );
     
+    console.log('Login successful:', email);
     const { password: _, ...userWithoutPassword } = user;
     res.json({ token, user: userWithoutPassword });
   } catch (error) {
-    res.status(500).json({ error: 'Login failed' });
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed', details: error.message });
   }
 });
 

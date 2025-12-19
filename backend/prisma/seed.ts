@@ -32,15 +32,6 @@ async function main() {
     },
   });
 
-  const operator = await prisma.user.create({
-    data: {
-      email: 'op@dts.local',
-      name: 'Operator',
-      password: hashedPassword,
-      role: Role.OPERATOR,
-    },
-  });
-
   const clientAdmin = await prisma.user.create({
     data: {
       email: 'client@acme.local',
@@ -51,7 +42,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Users:', admin.email, operator.email, clientAdmin.email);
+  console.log('✅ Users:', admin.email, clientAdmin.email);
 
   // Devices
   console.log('\nCreating devices...');
