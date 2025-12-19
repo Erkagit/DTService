@@ -640,9 +640,7 @@ export default function LandingPage() {
                 {/* Test Credentials */}
                 <div className="bg-gray-50 rounded-xl p-4 text-center">
                   <p className="text-xs text-gray-500 mb-2">
-                  </p>
-                  <p className="text-sm font-mono text-gray-700">admin@dts.local / password123</p>
-                </div>
+                  </p>                </div>
               </div>
             </div>
           </div>
