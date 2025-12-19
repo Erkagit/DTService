@@ -330,9 +330,6 @@ app.patch('/api/orders/:id/status', async (req, res) => {
     res.status(500).json({ error: 'Failed to update order status', details: error.message });
   }
 });
-    res.status(500).json({ error: 'Failed to update order', details: error.message });
-  }
-});
 
 app.delete('/api/orders/:id', async (req, res) => {
   try {
