@@ -4,6 +4,10 @@
 .env.local
 .env.*.local
 
+# vercel
+.vercel/
+**/.vercel/
+
 # frontend
 frontend/node_modules
 frontend/.next

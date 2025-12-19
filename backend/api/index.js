@@ -99,8 +99,20 @@ app.put('/api/companies/:id', async (req, res) => {
 });
 
 app.delete('/api/companies/:id', async (req, res) => {
-  await prisma.company.delete({ where: { id: parseInt(req.params.id) } });
-  res.json({ success: true });
+  try {
+    // First delete related users
+    await prisma.user.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    // Delete related orders
+    await prisma.order.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    // Delete related preorders
+    await prisma.preOrder.deleteMany({ where: { companyId: parseInt(req.params.id) } });
+    // Then delete company
+    await prisma.company.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete company error:', error);
+    res.status(500).json({ error: 'Failed to delete company', details: error.message });
+  }
 });
 
 // Users
@@ -134,8 +146,13 @@ app.put('/api/users/:id', async (req, res) => {
 });
 
 app.delete('/api/users/:id', async (req, res) => {
-  await prisma.user.delete({ where: { id: parseInt(req.params.id) } });
-  res.json({ success: true });
+  try {
+    await prisma.user.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ error: 'Failed to delete user', details: error.message });
+  }
 });
 
 // Vehicles
@@ -158,8 +175,16 @@ app.put('/api/vehicles/:id', async (req, res) => {
 });
 
 app.delete('/api/vehicles/:id', async (req, res) => {
-  await prisma.vehicle.delete({ where: { id: parseInt(req.params.id) } });
-  res.json({ success: true });
+  try {
+    // Delete related orders first
+    await prisma.order.deleteMany({ where: { vehicleId: parseInt(req.params.id) } });
+    // Delete the vehicle
+    await prisma.vehicle.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete vehicle error:', error);
+    res.status(500).json({ error: 'Failed to delete vehicle', details: error.message });
+  }
 });
 
 // Devices
@@ -182,8 +207,18 @@ app.put('/api/devices/:id', async (req, res) => {
 });
 
 app.delete('/api/devices/:id', async (req, res) => {
-  await prisma.device.delete({ where: { id: parseInt(req.params.id) } });
-  res.json({ success: true });
+  try {
+    // Unlink from vehicle first
+    await prisma.vehicle.updateMany({ 
+      where: { deviceId: parseInt(req.params.id) },
+      data: { deviceId: null }
+    });
+    await prisma.device.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete device error:', error);
+    res.status(500).json({ error: 'Failed to delete device', details: error.message });
+  }
 });
 
 // Orders
@@ -204,17 +239,29 @@ app.post('/api/orders', async (req, res) => {
 });
 
 app.put('/api/orders/:id', async (req, res) => {
-  const order = await prisma.order.update({
-    where: { id: parseInt(req.params.id) },
-    data: req.body,
-    include: { company: true, vehicle: true }
-  });
-  res.json(order);
+  try {
+    const order = await prisma.order.update({
+      where: { id: parseInt(req.params.id) },
+      data: req.body,
+      include: { company: true, vehicle: true }
+    });
+    res.json(order);
+  } catch (error) {
+    console.error('Update order error:', error);
+    res.status(500).json({ error: 'Failed to update order', details: error.message });
+  }
 });
 
 app.delete('/api/orders/:id', async (req, res) => {
-  await prisma.order.delete({ where: { id: parseInt(req.params.id) } });
-  res.json({ success: true });
+  try {
+    // Delete order status history first
+    await prisma.orderStatusHistory.deleteMany({ where: { orderId: parseInt(req.params.id) } });
+    await prisma.order.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete order error:', error);
+    res.status(500).json({ error: 'Failed to delete order', details: error.message });
+  }
 });
 
 // PreOrders
@@ -244,8 +291,13 @@ app.put('/api/preorders/:id', async (req, res) => {
 });
 
 app.delete('/api/preorders/:id', async (req, res) => {
-  await prisma.preOrder.delete({ where: { id: parseInt(req.params.id) } });
-  res.json({ success: true });
+  try {
+    await prisma.preOrder.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete preorder error:', error);
+    res.status(500).json({ error: 'Failed to delete preorder', details: error.message });
+  }
 });
 
 module.exports = app;
