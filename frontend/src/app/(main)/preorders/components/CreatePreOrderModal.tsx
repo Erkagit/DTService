@@ -251,86 +251,63 @@ export function CreatePreOrderModal({
   const renderOrderPrice = () => {
     // Format number with thousand separators
     const formatNumber = (value: string) => {
-      const num = parseFloat(value);
+      const num = parseFloat(value.replace(/,/g, ''));
       if (isNaN(num) || num === 0) return '';
       return new Intl.NumberFormat('mn-MN').format(num);
     };
+
+    // Format display value with thousand separators
+    const formatDisplayValue = (value: string) => {
+      if (!value) return '';
+      const num = parseFloat(value.replace(/,/g, ''));
+      if (isNaN(num)) return '';
+      return new Intl.NumberFormat('mn-MN').format(num);
+    };
+
+    // Handle currency input - remove formatting, keep only numbers
+    const handleCurrencyChange = (field: keyof PreOrderFormData, displayValue: string) => {
+      // Remove all non-numeric characters except decimal point
+      const rawValue = displayValue.replace(/[^0-9]/g, '');
+      updateFormData(field, rawValue);
+    };
+
+    // Currency input component
+    const CurrencyInput = ({ label, field, value }: { label: string; field: keyof PreOrderFormData; value: string }) => (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+        <div className="relative">
+          <input
+            type="text"
+            value={formatDisplayValue(value)}
+            onChange={(e) => handleCurrencyChange(field, e.target.value)}
+            placeholder="0"
+            className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-right"
+          />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₮</span>
+        </div>
+      </div>
+    );
 
     return (
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Үнэ</h3>
         
         <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Ачилт"
-            type="number"
-            value={formData.loadingCost}
-            onChange={(e) => updateFormData('loadingCost', e.target.value)}
-            placeholder="0"
-          />
-
-          <Input
-            label="Тээвэр"
-            type="number"
-            value={formData.transportCost}
-            onChange={(e) => updateFormData('transportCost', e.target.value)}
-            placeholder="0"
-          />
-
-          <Input
-            label="Шилжүүлэн ачилт"
-            type="number"
-            value={formData.transshipmentCost}
-            onChange={(e) => updateFormData('transshipmentCost', e.target.value)}
-            placeholder="0"
-          />
-
-          <Input
-            label="Экспорт гааль"
-            type="number"
-            value={formData.exportCustomsCost}
-            onChange={(e) => updateFormData('exportCustomsCost', e.target.value)}
-            placeholder="0"
-          />
-
-          <Input
-            label="Монгол тээвэр"
-            type="number"
-            value={formData.mongolTransportCost}
-            onChange={(e) => updateFormData('mongolTransportCost', e.target.value)}
-            placeholder="0"
-          />
-
-          <Input
-            label="Импорт гааль"
-            type="number"
-            value={formData.importCustomsCost}
-            onChange={(e) => updateFormData('importCustomsCost', e.target.value)}
-            placeholder="0"
-          />
-
-          <Input
-            label="Ашиг"
-            type="number"
-            value={formData.profit}
-            onChange={(e) => updateFormData('profit', e.target.value)}
-            placeholder="0"
-          />
-
-          <Input
-            label="Зардал"
-            type="number"
-            value={formData.expense}
-            onChange={(e) => updateFormData('expense', e.target.value)}
-            placeholder="0"
-          />
+          <CurrencyInput label="Ачилт" field="loadingCost" value={formData.loadingCost} />
+          <CurrencyInput label="Тээвэр" field="transportCost" value={formData.transportCost} />
+          <CurrencyInput label="Шилжүүлэн ачилт" field="transshipmentCost" value={formData.transshipmentCost} />
+          <CurrencyInput label="Экспорт гааль" field="exportCustomsCost" value={formData.exportCustomsCost} />
+          <CurrencyInput label="Монгол тээвэр" field="mongolTransportCost" value={formData.mongolTransportCost} />
+          <CurrencyInput label="Импорт гааль" field="importCustomsCost" value={formData.importCustomsCost} />
+          <CurrencyInput label="Ашиг" field="profit" value={formData.profit} />
+          <CurrencyInput label="Зардал" field="expense" value={formData.expense} />
         </div>
 
         <div className="pt-4 border-t bg-blue-50 p-4 rounded-lg">
           <div className="flex justify-between items-center">
             <span className="text-lg font-semibold text-gray-700">Нийт дүн:</span>
             <span className="text-2xl font-bold text-blue-600">
-              {formData.totalAmount ? `${formatNumber(formData.totalAmount)}₮` : '0₮'}
+              {formData.totalAmount ? `${formatNumber(formData.totalAmount)} ₮` : '0 ₮'}
             </span>
           </div>
         </div>
