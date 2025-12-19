@@ -252,6 +252,38 @@ app.put('/api/orders/:id', async (req, res) => {
   }
 });
 
+// Update order status
+app.patch('/api/orders/:id/status', async (req, res) => {
+  try {
+    const { status, note } = req.body;
+    const orderId = parseInt(req.params.id);
+    
+    // Update the order status
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: { status },
+      include: { company: true, vehicle: true }
+    });
+    
+    // Create status history entry
+    await prisma.orderStatusHistory.create({
+      data: {
+        orderId,
+        status,
+        note: note || `Status changed to ${status}`
+      }
+    });
+    
+    res.json(order);
+  } catch (error) {
+    console.error('Update order status error:', error);
+    res.status(500).json({ error: 'Failed to update order status', details: error.message });
+  }
+});
+    res.status(500).json({ error: 'Failed to update order', details: error.message });
+  }
+});
+
 app.delete('/api/orders/:id', async (req, res) => {
   try {
     // Delete order status history first
