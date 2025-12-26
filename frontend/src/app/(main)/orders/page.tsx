@@ -12,7 +12,7 @@ import api from '@/services/api';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { CreateOrderModal, StatusUpdateModal, OrderCard } from './components';
+import { CreateOrderModal, StatusUpdateModal, OrderCard, ChangeVehicleModal } from './components';
 
 // Allowed status transitions - Sequential workflow with cancel option at each step
 const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -39,13 +39,13 @@ export default function OrdersPage() {
   const queryClient = useQueryClient();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showChangeVehicleModal, setShowChangeVehicleModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | ''>('');
   const [statusNote, setStatusNote] = useState('');
   const [showCompleted, setShowCompleted] = useState(false);
   
   const [formData, setFormData] = useState({
-    code: '',
     origin: '',
     destination: '',
     vehicleId: '',
@@ -98,7 +98,6 @@ export default function OrdersPage() {
       }
 
       const payload = {
-        code: data.code,
         origin: data.origin,
         destination: data.destination,
         vehicleId: data.vehicleId ? parseInt(data.vehicleId) : undefined,
@@ -168,18 +167,27 @@ export default function OrdersPage() {
     },
   });
 
-  const generateOrderCode = (count: number) => {
-    const year = new Date().getFullYear();
-    return `Achir Bayron LLC-${year}-${String(count).padStart(4, '0')}`;
-  };  const handleCreateClick = () => {
-    setFormData({ ...formData, code: generateOrderCode(orders?.length || 0) });
+  const convertToPreOrderMutation = useMutation({
+    mutationFn: async (orderId: number) => {
+      return ordersApi.convertToPreOrder(orderId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['preOrders'] });
+      alert('✅ Захиалга Pre-Order болгон буцаагдлаа!');
+    },
+    onError: (error: any) => {
+      alert('❌ ' + (error.response?.data?.error || 'Pre-Order болгоход алдаа гарлаа'));
+    },
+  });
+
+  const handleCreateClick = () => {
     setShowCreateForm(true);
   };
 
   const handleCloseCreateModal = () => {
     setShowCreateForm(false);
     setFormData({
-      code: '',
       origin: '',
       destination: '',
       vehicleId: '',
@@ -255,6 +263,29 @@ export default function OrdersPage() {
     }
   };
 
+  const handleChangeVehicle = (order: any) => {
+    setSelectedOrder(order);
+    setShowChangeVehicleModal(true);
+  };
+
+  const handleConvertToPreOrder = (order: any) => {
+    if (confirm(`"${order.code}" захиалгыг Pre-Order болгон буцаахдаа итгэлтэй байна уу?`)) {
+      convertToPreOrderMutation.mutate(order.id);
+    }
+  };
+
+  const handleSubmitChangeVehicle = async (orderId: number, vehicleId: string | null) => {
+    try {
+      await ordersApi.updateVehicle(orderId, vehicleId);
+      setShowChangeVehicleModal(false);
+      setSelectedOrder(null);
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      alert('✅ Машин амжилттай солигдлоо!');
+    } catch (error: any) {
+      alert(error?.response?.data?.error || 'Машин солихэд алдаа гарлаа');
+    }
+  };
+
   if (!user) {
     router.push('/');
     return null;
@@ -311,6 +342,19 @@ export default function OrdersPage() {
         />
       )}
 
+      {selectedOrder && (
+        <ChangeVehicleModal
+          isOpen={showChangeVehicleModal}
+          onClose={() => {
+            setShowChangeVehicleModal(false);
+            setSelectedOrder(null);
+          }}
+          onSubmit={handleSubmitChangeVehicle}
+          order={selectedOrder}
+          vehicles={vehicles || []}
+        />
+      )}
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -332,7 +376,7 @@ export default function OrdersPage() {
               </div>
               
               {activeOrders.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-visible">
                   {activeOrders.map((order: any) => (
                     <OrderCard
                       key={order.id}
@@ -342,6 +386,8 @@ export default function OrdersPage() {
                       nextStatus={getNextStatus(order.status as OrderStatus)}
                       onQuickUpdate={handleQuickStatusUpdate}
                       onDelete={user?.role === 'ADMIN' ? handleDeleteOrder : undefined}
+                      onChangeVehicle={user?.role === 'ADMIN' ? handleChangeVehicle : undefined}
+                      onConvertToPreOrder={user?.role === 'ADMIN' ? handleConvertToPreOrder : undefined}
                     />
                   ))}
                 </div>
@@ -373,7 +419,7 @@ export default function OrdersPage() {
               </div>
               
               {showCompleted && completedOrders.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-75">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-75 overflow-visible">
                   {completedOrders.map((order: any) => (
                     <OrderCard
                       key={order.id}
@@ -383,6 +429,8 @@ export default function OrdersPage() {
                       nextStatus={null}
                       onQuickUpdate={handleQuickStatusUpdate}
                       onDelete={user?.role === 'ADMIN' ? handleDeleteOrder : undefined}
+                      onChangeVehicle={user?.role === 'ADMIN' ? handleChangeVehicle : undefined}
+                      onConvertToPreOrder={user?.role === 'ADMIN' ? handleConvertToPreOrder : undefined}
                     />
                   ))}
                 </div>
@@ -409,8 +457,6 @@ export default function OrdersPage() {
             icon={Package}
             title={t('orders.noOrders')}
             description={t('orders.createFirst')}
-            actionLabel={t('orders.create')}
-            onAction={handleCreateClick}
           />
         )}
       </main>

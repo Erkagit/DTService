@@ -22,7 +22,7 @@ export function ConfirmModal({
   isLoading = false,
 }: ConfirmModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="sm">
+    <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
       <div className="space-y-4">
         <div className="flex items-start gap-3">
           <div className="p-2 bg-red-100 rounded-lg">

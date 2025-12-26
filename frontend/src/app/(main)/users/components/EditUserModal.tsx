@@ -73,7 +73,7 @@ export function EditUserModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Edit User" maxWidth="form">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Edit User" size="md">
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           label="Name"

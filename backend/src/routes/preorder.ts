@@ -225,4 +225,77 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Create order from pre-order
+router.post('/:id/create-order', async (req, res) => {
+  try {
+    const preOrderId = parseInt(req.params.id);
+    const { vehicleId } = req.body;
+
+    console.log('Create order from preOrder:', { preOrderId, vehicleId });
+
+    if (!vehicleId) return res.status(400).json({ error: 'Vehicle is required' });
+
+    // Find preOrder
+    const preOrder = await prisma.preOrder.findUnique({ where: { id: preOrderId } });
+    if (!preOrder) {
+      console.log('PreOrder not found:', preOrderId);
+      return res.status(404).json({ error: 'PreOrder not found' });
+    }
+
+    console.log('Found preOrder:', preOrder);
+
+    if (!preOrder.companyId) {
+      console.log('PreOrder has no companyId:', preOrder);
+      return res.status(400).json({ error: 'PreOrder must have a company' });
+    }
+
+    // Generate sequential order code
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+
+    // Get the count of orders created today to generate sequential number
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+    const ordersToday = await prisma.order.count({
+      where: {
+        createdAt: {
+          gte: todayStart,
+          lt: todayEnd
+        }
+      }
+    });
+
+    const sequentialNumber = String(ordersToday + 1).padStart(4, '0');
+    const code = `Achir-Bairon-${y}-${m}-${d}-${sequentialNumber}`;
+
+    console.log('Generated order code:', code);
+
+    // Create order from preOrder fields
+    const order = await prisma.order.create({
+      data: {
+        code,
+        companyId: preOrder.companyId,
+        origin: preOrder.pickupAddress || '',
+        destination: preOrder.deliveryAddress || '',
+        vehicleId: parseInt(vehicleId),
+        createdById: 1, // TODO: Replace with actual user id
+        status: 'PENDING',
+      },
+      include: { company: true, vehicle: true }
+    });
+
+    console.log('Created order:', order);
+
+    // Link preOrder to order
+    await prisma.preOrder.update({ where: { id: preOrderId }, data: { orderId: order.id } });
+    res.json(order);
+  } catch (error: any) {
+    console.error('PreOrder to Order error:', error);
+    res.status(500).json({ error: 'Failed to create order from preOrder', details: error.message });
+  }
+});
+
 export const preOrderRouter = router;

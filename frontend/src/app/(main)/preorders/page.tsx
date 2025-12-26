@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { preOrdersApi, companiesApi } from '@/services/api';
+import { preOrdersApi, companiesApi, vehiclesApi } from '@/services/api';
 import { FileBox, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
-import { CreatePreOrderModal, PreOrderCard, PreOrderDetailModal } from './components';
+import { CreatePreOrderModal, PreOrderCard, PreOrderDetailModal, CreateOrderFromPreOrderModal } from './components';
 import type { PreOrder, VehicleType, TrailerType, ContainerOption } from '@/types/types';
 
 interface PreOrderFormData {
@@ -51,6 +51,10 @@ export default function PreOrdersPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPreOrder, setSelectedPreOrder] = useState<PreOrder | null>(null);
 
+  // Order үүсгэх modal state
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderPreOrder, setOrderPreOrder] = useState<PreOrder | null>(null);
+
   const { data: preOrders, isLoading } = useQuery({
     queryKey: ['preOrders'],
     queryFn: async () => {
@@ -73,6 +77,14 @@ export default function PreOrdersPage() {
     queryKey: ['companies'],
     queryFn: async () => {
       const res = await companiesApi.getAll();
+      return res.data;
+    },
+  });
+
+  const { data: vehicles } = useQuery({
+    queryKey: ['vehicles'],
+    queryFn: async () => {
+      const res = await vehiclesApi.getAll();
       return res.data;
     },
   });
@@ -161,6 +173,27 @@ export default function PreOrdersPage() {
     }
   };
 
+  // Order үүсгэх товч дарахад дуудагдана
+  const handleCreateOrder = (preOrder: PreOrder) => {
+    setOrderPreOrder(preOrder);
+    setShowOrderModal(true);
+  };
+
+  // PreOrder-оос Order үүсгэх submit handler
+  const handleSubmitOrderFromPreOrder = async ({ preOrderId, vehicleId }: { preOrderId: number, vehicleId: string }) => {
+    try {
+      await preOrdersApi.createOrder(preOrderId, { vehicleId });
+      setShowOrderModal(false);
+      setOrderPreOrder(null);
+      queryClient.invalidateQueries({ queryKey: ['preOrders'] });
+      // Optionally, also refresh orders if needed
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      alert('✅ Order амжилттай үүсгэгдлээ!');
+    } catch (error: any) {
+      alert(error?.response?.data?.error || 'Order үүсгэхэд алдаа гарлаа');
+    }
+  };
+
   const isAdmin = user?.role === 'ADMIN';
 
   // Only ADMIN can access this page
@@ -177,7 +210,7 @@ export default function PreOrdersPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-0">
       <PageHeader
         icon={<FileBox className="w-6 h-6 text-white" />}
         title="Урьдчилсан захиалга"
@@ -208,6 +241,7 @@ export default function PreOrdersPage() {
               preOrder={preOrder}
               onView={handleView}
               onDelete={handleDelete}
+              onCreateOrder={handleCreateOrder}
             />
           ))}
         </div>
@@ -243,6 +277,15 @@ export default function PreOrdersPage() {
         message={`"${selectedPreOrder?.name}" урьдчилсан захиалгыг устгахдаа итгэлтэй байна уу?`}
         confirmLabel="Устгах"
         isLoading={deleteMutation.isPending}
+      />
+
+      <CreateOrderFromPreOrderModal
+        isOpen={showOrderModal}
+        onClose={() => setShowOrderModal(false)}
+        preOrder={orderPreOrder}
+        vehicles={vehicles || []}
+        isLoading={false}
+        onSubmit={handleSubmitOrderFromPreOrder}
       />
     </div>
   );

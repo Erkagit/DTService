@@ -101,11 +101,15 @@ export const devicesApi = {
 
 export const ordersApi = {
   getAll: () => api.get<Order[]>('/api/orders'),
-  create: (data: { code: string; origin: string; destination: string; vehicleId?: number; companyId?: number }) =>
+  create: (data: { origin: string; destination: string; vehicleId?: number; companyId?: number }) =>
     api.post<Order>('/api/orders', data),
   update: (id: number, data: { code?: string; origin?: string; destination?: string; vehicleId?: number; status?: string }) =>
     api.put<Order>(`/api/orders/${id}`, data),
   delete: (id: number) => api.delete(`/api/orders/${id}`),
+  updateVehicle: (id: number, vehicleId: string | null) =>
+    api.patch<Order>(`/api/orders/${id}/vehicle`, { vehicleId }),
+  convertToPreOrder: (id: number) =>
+    api.post(`/api/orders/${id}/convert-to-preorder`),
 };
 
 export const preOrdersApi = {
@@ -114,6 +118,8 @@ export const preOrdersApi = {
   create: (data: Partial<PreOrder>) => api.post<PreOrder>('/api/preorders', data),
   update: (id: number, data: Partial<PreOrder>) => api.put<PreOrder>(`/api/preorders/${id}`, data),
   delete: (id: number) => api.delete(`/api/preorders/${id}`),
+  createOrder: (preOrderId: number, data: { vehicleId: string }) =>
+    api.post(`/api/preorders/${preOrderId}/create-order`, data),
 };
 
 export default api;

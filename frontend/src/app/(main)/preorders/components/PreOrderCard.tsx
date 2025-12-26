@@ -10,9 +10,10 @@ interface PreOrderCardProps {
   preOrder: PreOrder;
   onView: (preOrder: PreOrder) => void;
   onDelete: (preOrder: PreOrder) => void;
+  onCreateOrder: (preOrder: PreOrder) => void;
 }
 
-export function PreOrderCard({ preOrder, onView, onDelete }: PreOrderCardProps) {
+export function PreOrderCard({ preOrder, onView, onDelete, onCreateOrder }: PreOrderCardProps) {
   const formatCurrency = (value: number | null) => {
     if (value === null) return '-';
     return new Intl.NumberFormat('mn-MN').format(value) + '₮';
@@ -124,6 +125,13 @@ export function PreOrderCard({ preOrder, onView, onDelete }: PreOrderCardProps) 
       {/* Date */}
       <div className="text-xs text-gray-400 mt-2">
         {new Date(preOrder.createdAt).toLocaleDateString('mn-MN')}
+      </div>
+
+      {/* Order үүсгэх товч */}
+      <div className="mt-3 flex justify-end">
+        <Button size="sm" variant="primary" onClick={() => onCreateOrder(preOrder)}>
+          Order үүсгэх
+        </Button>
       </div>
     </Card>
   );

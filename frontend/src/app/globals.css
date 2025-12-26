@@ -26,9 +26,15 @@ body {
   overflow-x: hidden;
 }
 
-/* Prevent horizontal scrolling on mobile */
+/* Prevent horizontal scrolling on mobile - but allow modals and specific components to exceed */
 * {
   max-width: 100%;
+}
+
+/* Modal specific overrides - ensure modal container is not affected by global max-width rule */
+div.modal-container,
+div.modal-container * {
+  max-width: none !important;
 }
 
 /* Allow specific elements to exceed when needed */
@@ -42,5 +48,5 @@ body {
 .max-w-lg,
 .max-w-md,
 .max-w-sm {
-  max-width: inherit;
+  max-width: inherit !important;
 }

@@ -25,7 +25,7 @@ export function EditCompanyModal({
   if (!company) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Компани засах" maxWidth="form">
+    <Modal isOpen={isOpen} onClose={onClose} title="Компани засах" size="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Компанийн нэр"

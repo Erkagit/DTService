@@ -12,7 +12,7 @@ export function CreateDeviceModal({
   isLoading,
 }: CreateDeviceModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ GPS төхөөрөмж нэмэх" maxWidth="form">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ GPS төхөөрөмж нэмэх" size="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Төхөөрөмжийн ID"

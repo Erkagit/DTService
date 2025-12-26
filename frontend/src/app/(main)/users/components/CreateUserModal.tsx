@@ -14,7 +14,7 @@ export function CreateUserModal({
   isLoading,
 }: CreateUserModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create New User" maxWidth="form">
+    <Modal isOpen={isOpen} onClose={onClose} title="Create New User" size="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Name"

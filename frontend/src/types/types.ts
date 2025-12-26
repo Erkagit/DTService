@@ -120,6 +120,7 @@ export interface Order {
   vehicle?: Vehicle;
   createdBy?: User;
   assignedTo?: User;
+  preOrders?: PreOrder[];
 }
 
 // ============================================
@@ -285,6 +286,8 @@ export interface OrderCardProps {
   nextStatus: OrderStatus | null;
   onQuickUpdate: (order: Order, status: OrderStatus) => void;
   onDelete?: (order: Order) => void;
+  onChangeVehicle?: (order: Order) => void;
+  onConvertToPreOrder?: (order: Order) => void;
 }
 
 export interface CreateOrderModalProps {
@@ -292,7 +295,6 @@ export interface CreateOrderModalProps {
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
   formData: {
-    code: string;
     origin: string;
     destination: string;
     vehicleId: string;

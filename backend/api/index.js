@@ -305,8 +305,39 @@ app.get('/api/orders', async (req, res) => {
 });
 
 app.post('/api/orders', async (req, res) => {
+  const { origin, destination, vehicleId, companyId } = req.body;
+  
+  // Generate sequential order code
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  
+  // Get the count of orders created today to generate sequential number
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  
+  const ordersToday = await getPrisma().order.count({
+    where: {
+      createdAt: {
+        gte: todayStart,
+        lt: todayEnd
+      }
+    }
+  });
+  
+  const sequentialNumber = String(ordersToday + 1).padStart(4, '0');
+  const code = `Achir-Bairon-${y}-${m}-${d}-${sequentialNumber}`;
+  
   const order = await getPrisma().order.create({
-    data: req.body,
+    data: {
+      code,
+      origin,
+      destination,
+      vehicleId: vehicleId ? parseInt(vehicleId) : null,
+      companyId: parseInt(companyId),
+      createdById: 1, // TODO: Replace with actual user id
+    },
     include: { company: true, vehicle: true }
   });
   res.json(order);
@@ -400,6 +431,79 @@ app.delete('/api/preorders/:id', async (req, res) => {
   } catch (error) {
     console.error('Delete preorder error:', error);
     res.status(500).json({ error: 'Failed to delete preorder', details: error.message });
+  }
+});
+
+// PreOrder-оос Order үүсгэх
+app.post('/api/preorders/:id/create-order', async (req, res) => {
+  try {
+    const preOrderId = parseInt(req.params.id);
+    const { vehicleId } = req.body;
+    
+    console.log('Create order from preOrder:', { preOrderId, vehicleId });
+    
+    if (!vehicleId) return res.status(400).json({ error: 'Vehicle is required' });
+    
+    // Find preOrder
+    const preOrder = await getPrisma().preOrder.findUnique({ where: { id: preOrderId } });
+    if (!preOrder) {
+      console.log('PreOrder not found:', preOrderId);
+      return res.status(404).json({ error: 'PreOrder not found' });
+    }
+    
+    console.log('Found preOrder:', preOrder);
+    
+    if (!preOrder.companyId) {
+      console.log('PreOrder has no companyId:', preOrder);
+      return res.status(400).json({ error: 'PreOrder must have a company' });
+    }
+    
+    // Generate sequential order code
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    
+    // Get the count of orders created today to generate sequential number
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    
+    const ordersToday = await getPrisma().order.count({
+      where: {
+        createdAt: {
+          gte: todayStart,
+          lt: todayEnd
+        }
+      }
+    });
+    
+    const sequentialNumber = String(ordersToday + 1).padStart(4, '0');
+    const code = `Achir-Bairon-${y}-${m}-${d}-${sequentialNumber}`;
+    
+    console.log('Generated order code:', code);
+    
+    // Create order from preOrder fields
+    const order = await getPrisma().order.create({
+      data: {
+        code,
+        companyId: preOrder.companyId,
+        origin: preOrder.pickupAddress || '',
+        destination: preOrder.deliveryAddress || '',
+        vehicleId: parseInt(vehicleId),
+        createdById: 1, // TODO: Replace with actual user id
+        status: 'PENDING',
+      },
+      include: { company: true, vehicle: true }
+    });
+    
+    console.log('Created order:', order);
+    
+    // Link preOrder to order
+    await getPrisma().preOrder.update({ where: { id: preOrderId }, data: { orderId: order.id } });
+    res.json(order);
+  } catch (error) {
+    console.error('PreOrder to Order error:', error);
+    res.status(500).json({ error: 'Failed to create order from preOrder', details: error.message });
   }
 });
 

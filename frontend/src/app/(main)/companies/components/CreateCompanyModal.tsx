@@ -12,7 +12,7 @@ export function CreateCompanyModal({
   isLoading,
 }: CreateCompanyModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ компани үүсгэх" maxWidth="form">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ компани үүсгэх" size="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Компанийн нэр"
@@ -23,11 +23,11 @@ export function CreateCompanyModal({
           required
         />
 
-        <div className="flex gap-3 pt-4">
-          <Button type="button" onClick={onClose} variant="secondary" fullWidth>
+        <div className="flex justify-end gap-3 pt-4">
+          <Button type="button" onClick={onClose} variant="secondary">
             Цуцлах
           </Button>
-          <Button type="submit" disabled={isLoading} fullWidth>
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? 'Үүсгэж байна...' : 'Компани үүсгэх'}
           </Button>
         </div>

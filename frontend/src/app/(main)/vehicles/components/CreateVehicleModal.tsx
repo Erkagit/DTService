@@ -14,7 +14,7 @@ export function CreateVehicleModal({
   isLoading,
 }: CreateVehicleModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ тээврийн хэрэгсэл нэмэх" maxWidth="form">
+    <Modal isOpen={isOpen} onClose={onClose} title="Шинэ тээврийн хэрэгсэл нэмэх" size="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Улсын дугаар"
@@ -56,11 +56,11 @@ export function CreateVehicleModal({
           ))}
         </Select>
 
-        <div className="flex gap-3 pt-4">
-          <Button type="button" onClick={onClose} variant="secondary" fullWidth>
+        <div className="flex justify-end gap-3 pt-4">
+          <Button type="button" onClick={onClose} variant="secondary">
             Цуцлах
           </Button>
-          <Button type="submit" disabled={isLoading} variant="primary" fullWidth>
+          <Button type="submit" disabled={isLoading} variant="primary">
             {isLoading ? 'Үүсгэж байна...' : 'Тээврийн хэрэгсэл үүсгэх'}
           </Button>
         </div>

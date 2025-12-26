@@ -65,7 +65,7 @@ export function PreOrderDetailModal({ isOpen, onClose, preOrder, onUpdate, isUpd
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Урьдчилсан захиалгын дэлгэрэнгүй" maxWidth="2xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="Урьдчилсан захиалгын дэлгэрэнгүй" size="2xl">
       <div className="space-y-6">
         {/* Order Note Section */}
         <div className="bg-blue-50 p-4 rounded-lg">

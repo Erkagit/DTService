@@ -255,8 +255,6 @@ export default function DashboardPage() {
                 icon={Package}
                 title={t('dashboard.noOrdersFound')}
                 description={t('dashboard.createFirstOrderDesc')}
-                actionLabel={t('dashboard.createFirstOrder')}
-                onAction={() => {}}
               />
             )}
           </div>

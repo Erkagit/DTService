@@ -20,7 +20,7 @@ export function StatusUpdateModal({
   if (!order) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Update Order Status" maxWidth="form">
+    <Modal isOpen={isOpen} onClose={onClose} title="Update Order Status" size="md">
       <form onSubmit={onSubmit} className="space-y-4">
         <Input
           label="Order Code"
@@ -63,11 +63,11 @@ export function StatusUpdateModal({
           />
         </div>
 
-        <div className="flex gap-3 pt-4">
-          <Button type="button" onClick={onClose} variant="secondary" fullWidth>
+        <div className="flex justify-end gap-3 pt-4">
+          <Button type="button" onClick={onClose} variant="secondary">
             Cancel
           </Button>
-          <Button type="submit" disabled={isLoading} fullWidth>
+          <Button type="submit" disabled={isLoading}>
             {isLoading ? 'Updating...' : 'Update Status'}
           </Button>
         </div>

@@ -81,7 +81,8 @@ router.get('/', async (_req, res) => {
         vehicle: true,
         company: true,
         createdBy: true,
-        assignedTo: true
+        assignedTo: true,
+        preOrders: true
       }
     });
     res.json(orders);
@@ -318,6 +319,47 @@ router.patch('/:id/status', requireRole(Role.ADMIN), async (req, res) => {
   }
 });
 
+// Update order vehicle (Admin only)
+router.patch('/:id/vehicle', requireRole(Role.ADMIN), async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+    const { vehicleId } = req.body;
+
+    if (isNaN(orderId)) {
+      return res.status(400).json({ error: 'Invalid order ID' });
+    }
+
+    // Check if order exists
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: orderId }
+    });
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Update the order's vehicle
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        vehicleId: vehicleId ? parseInt(vehicleId) : null
+      },
+      include: {
+        vehicle: true,
+        company: true,
+        preOrders: true,
+        createdBy: true,
+        assignedTo: true
+      }
+    });
+
+    res.json(updatedOrder);
+  } catch (error: any) {
+    console.error('Update order vehicle error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get order status history
 router.get('/:id/history', async (req, res) => {
   try {
@@ -329,6 +371,46 @@ router.get('/:id/history', async (req, res) => {
     });
 
     res.json(history);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Convert order back to pre-order
+router.post('/:id/convert-to-preorder', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    // Get the order with preOrders
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: { preOrders: true }
+    });
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    if (!order.preOrders || order.preOrders.length === 0) {
+      return res.status(400).json({ error: 'Order has no associated pre-orders' });
+    }
+
+    // Update preOrders to remove orderId
+    await prisma.preOrder.updateMany({
+      where: { orderId: id },
+      data: { orderId: null }
+    });
+
+    // Delete the order and its status history
+    await prisma.orderStatusHistory.deleteMany({
+      where: { orderId: id }
+    });
+
+    await prisma.order.delete({
+      where: { id }
+    });
+
+    res.json({ message: 'Order converted back to pre-order successfully' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
