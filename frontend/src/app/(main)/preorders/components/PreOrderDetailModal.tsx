@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Building2, MapPin, Package, Truck, FileCheck, DollarSign, CreditCard, Save } from 'lucide-react';
 import type { PreOrder } from '@/types/types';
 import { VEHICLE_TYPE_LABELS, TRAILER_TYPE_LABELS } from '@/types/types';
+import { useAuth } from '@/context/AuthProvider';
 
 interface PreOrderDetailModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface PreOrderDetailModalProps {
 }
 
 export function PreOrderDetailModal({ isOpen, onClose, preOrder, onUpdate, isUpdating }: PreOrderDetailModalProps) {
+  const { user } = useAuth();
   const [paymentData, setPaymentData] = useState({
     invoiceSent: false,
     paymentReceived: false,
@@ -221,64 +223,66 @@ export function PreOrderDetailModal({ isOpen, onClose, preOrder, onUpdate, isUpd
         </div>
 
         {/* Tulbur Section - Төлбөр */}
-        <div className="bg-orange-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold text-orange-800 mb-3 flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Төлбөр
-            {hasChanges && <span className="text-xs bg-orange-200 px-2 py-0.5 rounded-full">Өөрчлөгдсөн</span>}
-          </h3>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <button 
-              onClick={() => handleToggle('invoiceSent')}
-              className={`flex items-center justify-between p-3 bg-white rounded-lg border-2 transition-all hover:shadow-md cursor-pointer ${paymentData.invoiceSent ? 'border-green-400' : 'border-gray-200'}`}
-            >
-              <span className="text-sm text-gray-700">Нэхэмжлэл явуулсан</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentData.invoiceSent ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {paymentData.invoiceSent ? 'Тийм ✓' : 'Үгүй ✗'}
-              </span>
-            </button>
+        {user?.role === 'ADMIN' && (
+          <div className="bg-orange-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold text-orange-800 mb-3 flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Төлбөр
+              {hasChanges && <span className="text-xs bg-orange-200 px-2 py-0.5 rounded-full">Өөрчлөгдсөн</span>}
+            </h3>
             
-            <button 
-              onClick={() => handleToggle('paymentReceived')}
-              className={`flex items-center justify-between p-3 bg-white rounded-lg border-2 transition-all hover:shadow-md cursor-pointer ${paymentData.paymentReceived ? 'border-green-400' : 'border-gray-200'}`}
-            >
-              <span className="text-sm text-gray-700">Төлбөр төлөгдсөн</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentData.paymentReceived ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {paymentData.paymentReceived ? 'Тийм ✓' : 'Үгүй ✗'}
-              </span>
-            </button>
-            
-            <button 
-              onClick={() => handleToggle('idleTime')}
-              className={`flex items-center justify-between p-3 bg-white rounded-lg border-2 transition-all hover:shadow-md cursor-pointer ${paymentData.idleTime ? 'border-green-400' : 'border-gray-200'}`}
-            >
-              <span className="text-sm text-gray-700">Сул зогсолт</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentData.idleTime ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {paymentData.idleTime ? 'Тийм ✓' : 'Үгүй ✗'}
-              </span>
-            </button>
-            
-            <button 
-              onClick={() => handleToggle('transportDone')}
-              className={`flex items-center justify-between p-3 bg-white rounded-lg border-2 transition-all hover:shadow-md cursor-pointer ${paymentData.transportDone ? 'border-green-400' : 'border-gray-200'}`}
-            >
-              <span className="text-sm text-gray-700">Тээвэр</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentData.transportDone ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {paymentData.transportDone ? 'Тийм ✓' : 'Үгүй ✗'}
-              </span>
-            </button>
-          </div>
-
-          {hasChanges && (
-            <div className="mt-4 flex justify-end">
-              <Button onClick={handleSave} disabled={isUpdating}>
-                <Save className="w-4 h-4 mr-2" />
-                {isUpdating ? 'Хадгалж байна...' : 'Хадгалах'}
-              </Button>
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => handleToggle('invoiceSent')}
+                className={`flex items-center justify-between p-3 bg-white rounded-lg border-2 transition-all hover:shadow-md cursor-pointer ${paymentData.invoiceSent ? 'border-green-400' : 'border-gray-200'}`}
+              >
+                <span className="text-sm text-gray-700">Нэхэмжлэл явуулсан</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentData.invoiceSent ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {paymentData.invoiceSent ? 'Тийм ✓' : 'Үгүй ✗'}
+                </span>
+              </button>
+              
+              <button 
+                onClick={() => handleToggle('paymentReceived')}
+                className={`flex items-center justify-between p-3 bg-white rounded-lg border-2 transition-all hover:shadow-md cursor-pointer ${paymentData.paymentReceived ? 'border-green-400' : 'border-gray-200'}`}
+              >
+                <span className="text-sm text-gray-700">Төлбөр төлөгдсөн</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentData.paymentReceived ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {paymentData.paymentReceived ? 'Тийм ✓' : 'Үгүй ✗'}
+                </span>
+              </button>
+              
+              <button 
+                onClick={() => handleToggle('idleTime')}
+                className={`flex items-center justify-between p-3 bg-white rounded-lg border-2 transition-all hover:shadow-md cursor-pointer ${paymentData.idleTime ? 'border-green-400' : 'border-gray-200'}`}
+              >
+                <span className="text-sm text-gray-700">Сул зогсолт</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentData.idleTime ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {paymentData.idleTime ? 'Тийм ✓' : 'Үгүй ✗'}
+                </span>
+              </button>
+              
+              <button 
+                onClick={() => handleToggle('transportDone')}
+                className={`flex items-center justify-between p-3 bg-white rounded-lg border-2 transition-all hover:shadow-md cursor-pointer ${paymentData.transportDone ? 'border-green-400' : 'border-gray-200'}`}
+              >
+                <span className="text-sm text-gray-700">Тээвэр</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${paymentData.transportDone ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {paymentData.transportDone ? 'Тийм ✓' : 'Үгүй ✗'}
+                </span>
+              </button>
             </div>
-          )}
-        </div>
+
+            {hasChanges && (
+              <div className="mt-4 flex justify-end">
+                <Button onClick={handleSave} disabled={isUpdating}>
+                  <Save className="w-4 h-4 mr-2" />
+                  {isUpdating ? 'Хадгалж байна...' : 'Хадгалах'}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Date */}
         <div className="text-sm text-gray-500 text-right">
