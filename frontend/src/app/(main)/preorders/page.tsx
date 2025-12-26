@@ -199,18 +199,20 @@ export default function PreOrdersPage() {
   // Only ADMIN can access this page
   if (!isAdmin) {
     return (
-      <div className="p-6">
-        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-          <FileBox className="w-16 h-16 mb-4 text-gray-300" />
-          <p className="text-lg">Хандах эрхгүй байна</p>
-          <p className="text-sm">Энэ хуудсыг зөвхөн админ хандах боломжтой</p>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+            <FileBox className="w-16 h-16 mb-4 text-gray-300" />
+            <p className="text-lg">Хандах эрхгүй байна</p>
+            <p className="text-sm">Энэ хуудсыг зөвхөн админ хандах боломжтой</p>
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="p-0">
+    <div className="min-h-screen bg-gray-50">
       <PageHeader
         icon={<FileBox className="w-6 h-6 text-white" />}
         title="Урьдчилсан захиалга"
@@ -223,29 +225,31 @@ export default function PreOrdersPage() {
         }
       />
 
-      {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      ) : !preOrders || preOrders.length === 0 ? (
-        <EmptyState
-          icon={FileBox}
-          title="Урьдчилсан захиалга байхгүй"
-          description="Шинээр урьдчилсан захиалга үүсгэнэ үү"
-        />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-          {preOrders.map((preOrder: PreOrder) => (
-            <PreOrderCard
-              key={preOrder.id}
-              preOrder={preOrder}
-              onView={handleView}
-              onDelete={handleDelete}
-              onCreateOrder={handleCreateOrder}
-            />
-          ))}
-        </div>
-      )}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : !preOrders || preOrders.length === 0 ? (
+          <EmptyState
+            icon={FileBox}
+            title="Урьдчилсан захиалга байхгүй"
+            description="Шинээр урьдчилсан захиалга үүсгэнэ үү"
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {preOrders.map((preOrder: PreOrder) => (
+              <PreOrderCard
+                key={preOrder.id}
+                preOrder={preOrder}
+                onView={handleView}
+                onDelete={handleDelete}
+                onCreateOrder={handleCreateOrder}
+              />
+            ))}
+          </div>
+        )}
+      </main>
 
       <CreatePreOrderModal
         isOpen={showCreateModal}
