@@ -41,17 +41,24 @@ export default function MainLayout({
     { code: 'CN', label: '中文' },
   ];
 
-  const navigation = [
-    { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'CLIENT_ADMIN'] },
-    { nameKey: 'nav.orders', href: '/orders', icon: Package, roles: ['ADMIN', 'CLIENT_ADMIN'] },
-    { nameKey: 'nav.preOrders', href: '/preorders', icon: FileBox, roles: ['ADMIN'] },
-    { nameKey: 'nav.vehicles', href: '/vehicles', icon: Truck, roles: ['ADMIN'] },
-    { nameKey: 'nav.companies', href: '/companies', icon: Building2, roles: ['ADMIN'] },
-    { nameKey: 'nav.users', href: '/users', icon: Users, roles: ['ADMIN'] },
-    ...(user?.role === 'CLIENT_ADMIN' && user.companyId ? [
-      { nameKey: 'nav.myCompany', href: `/companies/${user.companyId}`, icon: Building2, roles: ['CLIENT_ADMIN'] }
-    ] : []),
-  ];
+  // Navigation items with role-based access
+  // CLIENT_ADMIN: Dashboard + Orders (view-only)
+  // ADMIN: Full access to all menu items
+  const navigation = user?.role === 'CLIENT_ADMIN' 
+    ? [
+        // CLIENT_ADMIN sees Dashboard and Orders (view-only)
+        { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['CLIENT_ADMIN'] },
+        { nameKey: 'nav.orders', href: '/orders', icon: Package, roles: ['CLIENT_ADMIN'] },
+      ]
+    : [
+        // ADMIN sees all menu items
+        { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN'] },
+        { nameKey: 'nav.orders', href: '/orders', icon: Package, roles: ['ADMIN'] },
+        { nameKey: 'nav.preOrders', href: '/preorders', icon: FileBox, roles: ['ADMIN'] },
+        { nameKey: 'nav.vehicles', href: '/vehicles', icon: Truck, roles: ['ADMIN'] },
+        { nameKey: 'nav.companies', href: '/companies', icon: Building2, roles: ['ADMIN'] },
+        { nameKey: 'nav.users', href: '/users', icon: Users, roles: ['ADMIN'] },
+      ];
 
   const filteredNavigation = navigation.filter(item => 
     user && item.roles.includes(user.role)

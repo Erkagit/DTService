@@ -31,6 +31,20 @@ export interface Vehicle {
   deviceId: number | null;
   device?: Device;
   pings?: LocationPing[];
+  // New fields for availability tracking
+  isAvailable?: boolean;
+  activeOrder?: {
+    id: number;
+    code: string;
+    status: string;
+    company?: { name: string };
+  } | null;
+  orders?: Array<{
+    id: number;
+    code: string;
+    status: string;
+    company?: { name: string };
+  }>;
 }
 
 export interface Device {
@@ -284,10 +298,11 @@ export interface OrderCardProps {
   canUpdate: boolean;
   previousStatus: OrderStatus | null;
   nextStatus: OrderStatus | null;
-  onQuickUpdate: (order: Order, status: OrderStatus) => void;
+  onQuickUpdate?: (order: Order, status: OrderStatus) => void;
   onDelete?: (order: Order) => void;
   onChangeVehicle?: (order: Order) => void;
-  onConvertToPreOrder?: (order: Order) => void;
+  isDeleting?: boolean;
+  isChangingVehicle?: boolean;
 }
 
 export interface CreateOrderModalProps {

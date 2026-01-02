@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { companiesApi } from '@/services/api';
@@ -16,6 +16,13 @@ export default function CompaniesPage() {
   const { t } = useLanguage();
   const router = useRouter();
   const queryClient = useQueryClient();
+  
+  // Redirect CLIENT_ADMIN to dashboard - they can only access dashboard
+  useEffect(() => {
+    if (user?.role === 'CLIENT_ADMIN') {
+      router.replace('/dashboard');
+    }
+  }, [user, router]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);

@@ -83,6 +83,7 @@ export const usersApi = {
 
 export const vehiclesApi = {
   getAll: () => api.get<Vehicle[]>('/api/vehicles'),
+  getAvailable: () => api.get<Vehicle[]>('/api/vehicles/available'),
   create: (data: { plateNo: string; driverName: string; driverPhone: string; deviceId?: number }) =>
     api.post<Vehicle>('/api/vehicles', data),
   update: (id: number, data: { plateNo?: string; driverName?: string; driverPhone?: string; deviceId?: number }) =>

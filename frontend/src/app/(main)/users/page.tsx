@@ -16,6 +16,13 @@ export default function UsersPage() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  
+  // Redirect CLIENT_ADMIN to dashboard - they can only access dashboard
+  useEffect(() => {
+    if (currentUser?.role === 'CLIENT_ADMIN') {
+      window.location.href = '/dashboard';
+    }
+  }, [currentUser]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);

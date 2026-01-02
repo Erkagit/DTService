@@ -12,6 +12,7 @@ interface DropdownProps {
 export function Dropdown({ isOpen, onClose, trigger, children, className = '' }: DropdownProps) {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const triggerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen && triggerRef.current) {
@@ -25,7 +26,13 @@ export function Dropdown({ isOpen, onClose, trigger, children, className = '' }:
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (triggerRef.current && !triggerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      
+      // Check if click is inside trigger or dropdown content
+      const isInsideTrigger = triggerRef.current && triggerRef.current.contains(target);
+      const isInsideDropdown = dropdownRef.current && dropdownRef.current.contains(target);
+      
+      if (!isInsideTrigger && !isInsideDropdown) {
         onClose();
       }
     };
@@ -41,9 +48,19 @@ export function Dropdown({ isOpen, onClose, trigger, children, className = '' }:
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      // Use setTimeout to avoid immediate close when opening
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 0);
       window.addEventListener('resize', updatePosition);
       window.addEventListener('scroll', updatePosition);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener('scroll', updatePosition);
+      };
     }
 
     return () => {
@@ -60,17 +77,15 @@ export function Dropdown({ isOpen, onClose, trigger, children, className = '' }:
       </div>
 
       {isOpen && createPortal(
-        <div className="fixed inset-0 z-40" onClick={onClose}>
-          <div
-            className={`absolute bg-white rounded-md shadow-lg border border-gray-200 ${className}`}
-            style={{
-              top: position.top,
-              left: position.left,
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {children}
-          </div>
+        <div 
+          ref={dropdownRef}
+          className={`fixed bg-white rounded-md shadow-lg border border-gray-200 z-50 ${className}`}
+          style={{
+            top: position.top,
+            left: position.left,
+          }}
+        >
+          {children}
         </div>,
         document.body
       )}

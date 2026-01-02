@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ordersApi, vehiclesApi, companiesApi } from '@/services/api';
@@ -44,6 +44,11 @@ export default function OrdersPage() {
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | ''>('');
   const [statusNote, setStatusNote] = useState('');
   const [showCompleted, setShowCompleted] = useState(false);
+  const [deletingOrderId, setDeletingOrderId] = useState<number | null>(null);
+  const [changingVehicleOrderId, setChangingVehicleOrderId] = useState<number | null>(null);
+  
+  // CLIENT_ADMIN can only VIEW orders, not modify them
+  const isAdmin = user?.role === 'ADMIN';
   
   const [formData, setFormData] = useState({
     origin: '',
@@ -156,28 +161,24 @@ export default function OrdersPage() {
 
   const deleteOrderMutation = useMutation({
     mutationFn: async (orderId: number) => {
-      return ordersApi.delete(orderId);
+      console.log('🔄 deleteOrderMutation: Starting delete for orderId:', orderId);
+      setDeletingOrderId(orderId);
+      const response = await ordersApi.delete(orderId);
+      console.log('🔄 deleteOrderMutation: Response received', response);
+      return response;
     },
     onSuccess: () => {
+      console.log('✅ deleteOrderMutation: Success!');
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       alert('✅ ' + t('orders.deleteSuccess'));
     },
     onError: (error: any) => {
+      console.error('❌ deleteOrderMutation: Error!', error);
       alert('❌ ' + (error.response?.data?.error || t('orders.deleteFailed')));
     },
-  });
-
-  const convertToPreOrderMutation = useMutation({
-    mutationFn: async (orderId: number) => {
-      return ordersApi.convertToPreOrder(orderId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['preOrders'] });
-      alert('✅ Захиалга Pre-Order болгон буцаагдлаа!');
-    },
-    onError: (error: any) => {
-      alert('❌ ' + (error.response?.data?.error || 'Pre-Order болгоход алдаа гарлаа'));
+    onSettled: () => {
+      console.log('🔄 deleteOrderMutation: Settled');
+      setDeletingOrderId(null);
     },
   });
 
@@ -258,32 +259,49 @@ export default function OrdersPage() {
   };
 
   const handleDeleteOrder = (order: any) => {
+    console.log('📋 handleDeleteOrder called', { orderId: order.id, orderCode: order.code });
     if (confirm(`"${order.code}" ${t('orders.deleteConfirm')}`)) {
+      console.log('📋 User confirmed delete, calling mutation...');
       deleteOrderMutation.mutate(order.id);
+    } else {
+      console.log('📋 User cancelled delete');
     }
   };
 
   const handleChangeVehicle = (order: any) => {
+    console.log('📋 handleChangeVehicle called', { orderId: order.id, orderCode: order.code });
     setSelectedOrder(order);
     setShowChangeVehicleModal(true);
   };
 
-  const handleConvertToPreOrder = (order: any) => {
-    if (confirm(`"${order.code}" захиалгыг Pre-Order болгон буцаахдаа итгэлтэй байна уу?`)) {
-      convertToPreOrderMutation.mutate(order.id);
-    }
-  };
-
-  const handleSubmitChangeVehicle = async (orderId: number, vehicleId: string | null) => {
-    try {
-      await ordersApi.updateVehicle(orderId, vehicleId);
+  const changeVehicleMutation = useMutation({
+    mutationFn: async ({ orderId, vehicleId }: { orderId: number; vehicleId: string | null }) => {
+      console.log('🔄 changeVehicleMutation: Starting change for', { orderId, vehicleId });
+      setChangingVehicleOrderId(orderId);
+      const response = await ordersApi.updateVehicle(orderId, vehicleId);
+      console.log('🔄 changeVehicleMutation: Response received', response);
+      return response;
+    },
+    onSuccess: () => {
+      console.log('✅ changeVehicleMutation: Success!');
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
       setShowChangeVehicleModal(false);
       setSelectedOrder(null);
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
       alert('✅ Машин амжилттай солигдлоо!');
-    } catch (error: any) {
-      alert(error?.response?.data?.error || 'Машин солихэд алдаа гарлаа');
-    }
+    },
+    onError: (error: any) => {
+      console.error('❌ changeVehicleMutation: Error!', error);
+      alert('❌ ' + (error?.response?.data?.error || 'Машин солихэд алдаа гарлаа'));
+    },
+    onSettled: () => {
+      console.log('🔄 changeVehicleMutation: Settled');
+      setChangingVehicleOrderId(null);
+    },
+  });
+
+  const handleSubmitChangeVehicle = (orderId: number, vehicleId: string | null) => {
+    console.log('📋 handleSubmitChangeVehicle called', { orderId, vehicleId });
+    changeVehicleMutation.mutate({ orderId, vehicleId });
   };
 
   if (!user) {
@@ -305,9 +323,9 @@ export default function OrdersPage() {
       <PageHeader
         icon={<Package className="w-8 h-8 text-white" />}
         title={t('orders.title')}
-        subtitle={t('orders.subtitle')}
+        subtitle={user?.role === 'CLIENT_ADMIN' ? t('orders.viewOnly') || 'Зөвхөн харах эрхтэй' : t('orders.subtitle')}
         action={
-          user.role === 'ADMIN' ? (
+          isAdmin ? (
             <Button icon={Plus} onClick={handleCreateClick}>
               {t('orders.new')}
             </Button>
@@ -352,6 +370,7 @@ export default function OrdersPage() {
           onSubmit={handleSubmitChangeVehicle}
           order={selectedOrder}
           vehicles={vehicles || []}
+          isLoading={changeVehicleMutation.isPending}
         />
       )}
 
@@ -381,13 +400,14 @@ export default function OrdersPage() {
                     <OrderCard
                       key={order.id}
                       order={order}
-                      canUpdate={canUpdateStatus(order)}
-                      previousStatus={getPreviousStatus(order.status as OrderStatus)}
-                      nextStatus={getNextStatus(order.status as OrderStatus)}
-                      onQuickUpdate={handleQuickStatusUpdate}
-                      onDelete={user?.role === 'ADMIN' ? handleDeleteOrder : undefined}
-                      onChangeVehicle={user?.role === 'ADMIN' ? handleChangeVehicle : undefined}
-                      onConvertToPreOrder={user?.role === 'ADMIN' ? handleConvertToPreOrder : undefined}
+                      canUpdate={isAdmin && canUpdateStatus(order)}
+                      previousStatus={isAdmin ? getPreviousStatus(order.status as OrderStatus) : null}
+                      nextStatus={isAdmin ? getNextStatus(order.status as OrderStatus) : null}
+                      onQuickUpdate={isAdmin ? handleQuickStatusUpdate : undefined}
+                      onDelete={isAdmin ? handleDeleteOrder : undefined}
+                      onChangeVehicle={isAdmin ? handleChangeVehicle : undefined}
+                      isDeleting={deletingOrderId === order.id}
+                      isChangingVehicle={changingVehicleOrderId === order.id}
                     />
                   ))}
                 </div>
@@ -427,10 +447,11 @@ export default function OrdersPage() {
                       canUpdate={false}
                       previousStatus={null}
                       nextStatus={null}
-                      onQuickUpdate={handleQuickStatusUpdate}
-                      onDelete={user?.role === 'ADMIN' ? handleDeleteOrder : undefined}
-                      onChangeVehicle={user?.role === 'ADMIN' ? handleChangeVehicle : undefined}
-                      onConvertToPreOrder={user?.role === 'ADMIN' ? handleConvertToPreOrder : undefined}
+                      onQuickUpdate={isAdmin ? handleQuickStatusUpdate : undefined}
+                      onDelete={isAdmin ? handleDeleteOrder : undefined}
+                      onChangeVehicle={isAdmin ? handleChangeVehicle : undefined}
+                      isDeleting={deletingOrderId === order.id}
+                      isChangingVehicle={changingVehicleOrderId === order.id}
                     />
                   ))}
                 </div>
