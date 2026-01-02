@@ -5,10 +5,23 @@ import { Role } from '@prisma/client';
 
 const router = Router();
 
-// Get all pre-orders
-router.get('/', async (_req, res) => {
+// Get all pre-orders (excluding those already converted to orders)
+router.get('/', async (req, res) => {
   try {
+    const requestingUser = req.user;
+    
+    // Build where clause - exclude pre-orders that have been converted to orders
+    const whereClause: any = {
+      orderId: null  // Only get pre-orders that haven't been converted to orders
+    };
+    
+    // Filter by company for CLIENT_ADMIN
+    if (requestingUser?.role === 'CLIENT_ADMIN' && requestingUser.companyId) {
+      whereClause.companyId = requestingUser.companyId;
+    }
+
     const preOrders = await prisma.preOrder.findMany({
+      where: whereClause,
       include: {
         company: true,
         order: true,
@@ -225,21 +238,54 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Create order from pre-order
+// Create order from pre-order (Atomic transaction)
 router.post('/:id/create-order', async (req, res) => {
   try {
     const preOrderId = parseInt(req.params.id);
     const { vehicleId } = req.body;
+    const requestingUser = req.user;
 
     console.log('Create order from preOrder:', { preOrderId, vehicleId });
 
     if (!vehicleId) return res.status(400).json({ error: 'Vehicle is required' });
 
-    // Find preOrder
-    const preOrder = await prisma.preOrder.findUnique({ where: { id: preOrderId } });
+    // Find preOrder with company
+    const preOrder = await prisma.preOrder.findUnique({ 
+      where: { id: preOrderId },
+      include: { company: true, order: true }
+    });
+    
     if (!preOrder) {
       console.log('PreOrder not found:', preOrderId);
       return res.status(404).json({ error: 'PreOrder not found' });
+    }
+
+    // Check if preOrder is already converted to an order
+    if (preOrder.orderId || preOrder.order) {
+      return res.status(400).json({ 
+        error: 'Энэ урьдчилсан захиалга аль хэдийн захиалга болсон байна',
+        existingOrderId: preOrder.orderId 
+      });
+    }
+
+    // Check if vehicle is already assigned to an active order
+    const vehicleIdInt = parseInt(vehicleId);
+    const existingActiveOrder = await prisma.order.findFirst({
+      where: {
+        vehicleId: vehicleIdInt,
+        status: {
+          notIn: ['COMPLETED', 'CANCELLED']
+        }
+      },
+      include: { company: true }
+    });
+
+    if (existingActiveOrder) {
+      return res.status(400).json({ 
+        error: `Энэ машин "${existingActiveOrder.company?.name || ''}" компанийн идэвхтэй захиалгад оноогдсон байна. Машин суллагдсан (захиалга дууссан/цуцлагдсан) үед дахин оноох боломжтой.`,
+        existingOrderId: existingActiveOrder.id,
+        existingOrderCode: existingActiveOrder.code
+      });
     }
 
     console.log('Found preOrder:', preOrder);
@@ -273,25 +319,49 @@ router.post('/:id/create-order', async (req, res) => {
 
     console.log('Generated order code:', code);
 
-    // Create order from preOrder fields
-    const order = await prisma.order.create({
-      data: {
-        code,
-        companyId: preOrder.companyId,
-        origin: preOrder.pickupAddress || '',
-        destination: preOrder.deliveryAddress || '',
-        vehicleId: parseInt(vehicleId),
-        createdById: 1, // TODO: Replace with actual user id
-        status: 'PENDING',
-      },
-      include: { company: true, vehicle: true }
+    // Use transaction to ensure atomicity - either all changes succeed or none
+    const orderWithPreOrders = await prisma.$transaction(async (tx) => {
+      // Create order from preOrder fields with all relevant data
+      const order = await tx.order.create({
+        data: {
+          code,
+          companyId: preOrder.companyId!,  // companyId is validated above
+          origin: preOrder.pickupAddress || '',
+          destination: preOrder.deliveryAddress || '',
+          vehicleId: vehicleIdInt,
+          createdById: requestingUser?.id || 1,
+          status: 'PENDING',
+        },
+        include: { 
+          company: true, 
+          vehicle: true,
+          createdBy: true,
+          assignedTo: true
+        }
+      });
+
+      console.log('Created order:', order);
+
+      // Link preOrder to order - this marks it as converted
+      await tx.preOrder.update({ 
+        where: { id: preOrderId }, 
+        data: { orderId: order.id }
+      });
+
+      // Return order with preOrders included
+      return await tx.order.findUnique({
+        where: { id: order.id },
+        include: {
+          company: true,
+          vehicle: true,
+          createdBy: true,
+          assignedTo: true,
+          preOrders: true
+        }
+      });
     });
 
-    console.log('Created order:', order);
-
-    // Link preOrder to order
-    await prisma.preOrder.update({ where: { id: preOrderId }, data: { orderId: order.id } });
-    res.json(order);
+    res.json(orderWithPreOrders);
   } catch (error: any) {
     console.error('PreOrder to Order error:', error);
     res.status(500).json({ error: 'Failed to create order from preOrder', details: error.message });

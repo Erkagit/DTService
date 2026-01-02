@@ -13,12 +13,80 @@ router.get('/', async (req, res) => {
           take: 1,
           orderBy: { at: 'desc' },
         },
+        orders: {
+          where: {
+            status: {
+              notIn: ['COMPLETED', 'CANCELLED']
+            }
+          },
+          select: {
+            id: true,
+            code: true,
+            status: true,
+            company: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
       },
     });
-    res.json(vehicles);
+    
+    // Add availability status to each vehicle
+    const vehiclesWithAvailability = vehicles.map(vehicle => ({
+      ...vehicle,
+      isAvailable: vehicle.orders.length === 0,
+      activeOrder: vehicle.orders.length > 0 ? vehicle.orders[0] : null
+    }));
+    
+    res.json(vehiclesWithAvailability);
   } catch (error) {
     console.error('Error fetching vehicles:', error);
     res.status(500).json({ error: 'Failed to fetch vehicles' });
+  }
+});
+
+// GET /api/vehicles/available - Get only available vehicles
+router.get('/available', async (req, res) => {
+  try {
+    // Get all vehicle IDs that are currently assigned to active orders
+    const activeOrders = await prisma.order.findMany({
+      where: {
+        vehicleId: { not: null },
+        status: {
+          notIn: ['COMPLETED', 'CANCELLED']
+        }
+      },
+      select: {
+        vehicleId: true
+      }
+    });
+    
+    const assignedVehicleIds = activeOrders
+      .map(order => order.vehicleId)
+      .filter((id): id is number => id !== null);
+    
+    // Get vehicles that are not in the assigned list
+    const availableVehicles = await prisma.vehicle.findMany({
+      where: {
+        id: {
+          notIn: assignedVehicleIds
+        }
+      },
+      include: {
+        device: true,
+        pings: {
+          take: 1,
+          orderBy: { at: 'desc' },
+        },
+      },
+    });
+    
+    res.json(availableVehicles);
+  } catch (error) {
+    console.error('Error fetching available vehicles:', error);
+    res.status(500).json({ error: 'Failed to fetch available vehicles' });
   }
 });
 
