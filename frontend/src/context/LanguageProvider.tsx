@@ -57,7 +57,6 @@ const translations: Record<string, Record<Language, string>> = {
   'orders.orderCompleted': { MN: 'захиалга дууссан', EN: 'orders completed', CN: '订单已完成' },
   'orders.hide': { MN: 'Нуух', EN: 'Hide', CN: '隐藏' },
   'orders.show': { MN: 'Харуулах', EN: 'Show', CN: '显示' },
-  'orders.completedHidden': { MN: 'дууссан захиалга нуугдсан', EN: 'completed orders hidden', CN: '已完成订单已隐藏' },
   'orders.showCompleted': { MN: 'Дууссан захиалга харуулах', EN: 'Show completed orders', CN: '显示已完成订单' },
   'orders.noOrders': { MN: 'Захиалга байхгүй байна', EN: 'No orders available', CN: '目前没有订单' },
   'orders.createFirst': { MN: 'Эхлээд захиалга үүсгэнэ үү', EN: 'Please create an order first', CN: '请先创建订单' },

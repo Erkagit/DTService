@@ -5,7 +5,7 @@ import { UserPlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { useLanguage } from '@/context/LanguageProvider';
 import api from '@/services/api';
-import { PageHeader, Button } from '@/components/ui';
+import { PageHeader, Button, TableSkeleton } from '@/components/ui';
 import { CreateUserModal, UserTable, EditUserModal } from './components';
 import type { User, Company } from '@/types/types';
 
@@ -198,10 +198,7 @@ export default function UsersPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading users...</p>
-          </div>
+          <TableSkeleton rows={5} columns={5} />
         ) : (
           <UserTable 
             users={users} 

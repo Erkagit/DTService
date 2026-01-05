@@ -8,7 +8,7 @@ import api from '@/services/api';
 import { Package, Building2, UserPlus, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { useLanguage } from '@/context/LanguageProvider';
-import { PageHeader, Button, EmptyState } from '@/components/ui';
+import { PageHeader, Button, EmptyState, GridSkeleton } from '@/components/ui';
 import { CreateCompanyModal, CreateUserModal, CompanyCard, CompanyDetailsModal, EditCompanyModal } from './components';
 
 export default function CompaniesPage() {
@@ -239,11 +239,7 @@ export default function CompaniesPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-40 bg-white rounded-xl animate-pulse"></div>
-            ))}
-          </div>
+          <GridSkeleton count={6} />
         ) : companies && companies.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {companies.map((company) => (

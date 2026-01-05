@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { GridSkeleton } from '@/components/ui/Skeleton';
 import { CreatePreOrderModal, PreOrderCard, PreOrderDetailModal, CreateOrderFromPreOrderModal } from './components';
 import type { PreOrder, VehicleType, TrailerType, ContainerOption } from '@/types/types';
 
@@ -227,9 +228,7 @@ export default function PreOrdersPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
+          <GridSkeleton count={6} />
         ) : !preOrders || preOrders.length === 0 ? (
           <EmptyState
             icon={FileBox}

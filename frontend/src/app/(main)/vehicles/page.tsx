@@ -8,7 +8,7 @@ import api from '@/services/api';
 import { Truck, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
 import { useLanguage } from '@/context/LanguageProvider';
-import { PageHeader, Button, EmptyState } from '@/components/ui';
+import { PageHeader, Button, EmptyState, GridSkeleton } from '@/components/ui';
 import { CreateVehicleModal, CreateDeviceModal, VehicleCard, EditVehicleModal, EditDeviceModal } from './components';
 
 export default function VehiclesPage() {
@@ -286,11 +286,7 @@ export default function VehiclesPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-white rounded-xl animate-pulse"></div>
-            ))}
-          </div>
+          <GridSkeleton count={6} />
         ) : vehicles && vehicles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {vehicles.map((vehicle) => (

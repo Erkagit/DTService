@@ -12,6 +12,7 @@ import api from '@/services/api';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { GridSkeleton } from '@/components/ui/Skeleton';
 import { CreateOrderModal, StatusUpdateModal, OrderCard, ChangeVehicleModal } from './components';
 
 // Allowed status transitions - Sequential workflow with cancel option at each step
@@ -379,10 +380,12 @@ export default function OrdersPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-48 bg-white rounded-xl animate-pulse"></div>
-            ))}
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
+              <div className="h-6 w-40 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <GridSkeleton count={6} />
           </div>
         ) : orders && orders.length > 0 ? (
           <>
