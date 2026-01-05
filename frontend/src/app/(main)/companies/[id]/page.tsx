@@ -4,14 +4,13 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { companiesApi } from '@/services/api';
-import { Building2, Users, Package, ArrowLeft, Mail, Calendar, User as UserIcon, MapPin, Truck, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Building2, Users, Package, ArrowLeft, Mail, Calendar, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthProvider';
-import { PageHeader, Button } from '@/components/ui';
+import { PageHeader, Button, CompletedOrdersTable } from '@/components/ui';
 import { OrderCard } from '../../orders/components';
 import { CompletedOrderModal } from '../../reports/components';
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS, type OrderStatus } from '@/types/types';
+import { type OrderStatus } from '@/types/types';
 import { 
-  formatDate, 
   getPreviousStatus, 
   getNextStatus, 
   canUpdateOrderStatus,
@@ -26,8 +25,6 @@ export default function CompanyDetailPage() {
   const companyId = parseInt(params.id as string);
   const [showCompleted, setShowCompleted] = useState(true);
   const [viewingOrder, setViewingOrder] = useState<any>(null);
-  const [completedPage, setCompletedPage] = useState(1);
-  const COMPLETED_ITEMS_PER_PAGE = 10;
 
   const { data: company, isLoading } = useQuery({
     queryKey: ['company', companyId],
@@ -86,13 +83,6 @@ export default function CompanyDetailPage() {
   // Separate active and completed orders
   const activeOrders = sortedOrders.filter(order => isOrderActive(order.status));
   const completedOrders = sortedOrders.filter(order => isOrderCompleted(order.status));
-
-  // Pagination for completed orders
-  const completedTotalPages = Math.ceil(completedOrders.length / COMPLETED_ITEMS_PER_PAGE);
-  const paginatedCompletedOrders = completedOrders.slice(
-    (completedPage - 1) * COMPLETED_ITEMS_PER_PAGE,
-    completedPage * COMPLETED_ITEMS_PER_PAGE
-  );
 
   const isAdmin = user?.role?.toUpperCase() === 'ADMIN';
 
@@ -256,121 +246,17 @@ export default function CompanyDetailPage() {
             )}
           </div>
           
-          {showCompleted && completedOrders.length > 0 ? (
-            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-100">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                        Код
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                        Чиглэл
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                        Машин / Жолооч
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                        Статус
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                        Огноо
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">
-                        Үйлдэл
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {paginatedCompletedOrders.map((order: any) => (
-                      <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3">
-                          <span className="font-medium text-gray-900">{order.code}</span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="text-sm">
-                            <p className="text-gray-900 truncate max-w-[150px]" title={order.origin}>
-                              {order.origin}
-                            </p>
-                            <p className="text-gray-500 truncate max-w-[150px]" title={order.destination}>
-                              → {order.destination}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          {order.vehicle ? (
-                            <div className="flex items-center gap-2">
-                              <Truck className="w-4 h-4 text-gray-400" />
-                              <div className="text-sm">
-                                <p className="font-medium text-gray-900">{order.vehicle.plateNo}</p>
-                                <p className="text-gray-500">{order.vehicle.driverName}</p>
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-gray-400 text-sm">-</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${ORDER_STATUS_COLORS[order.status as OrderStatus]}`}>
-                            {ORDER_STATUS_LABELS[order.status as OrderStatus]}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <Calendar className="w-4 h-4" />
-                            {formatDate(order.createdAt)}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => setViewingOrder(order)}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Дэлгэрэнгүй"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {completedTotalPages > 1 && (
-                <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
-                  <p className="text-sm text-gray-500">
-                    {(completedPage - 1) * COMPLETED_ITEMS_PER_PAGE + 1} - {Math.min(completedPage * COMPLETED_ITEMS_PER_PAGE, completedOrders.length)} / {completedOrders.length}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setCompletedPage(p => Math.max(1, p - 1))}
-                      disabled={completedPage === 1}
-                      className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <span className="px-3 py-1 text-sm text-gray-700">
-                      {completedPage} / {completedTotalPages}
-                    </span>
-                    <button
-                      onClick={() => setCompletedPage(p => Math.min(completedTotalPages, p + 1))}
-                      disabled={completedPage === completedTotalPages}
-                      className="p-2 rounded-lg border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : completedOrders.length === 0 ? (
-            <div className="bg-white rounded-lg border-2 border-dashed border-gray-200 p-12 text-center">
-              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">No completed orders yet</p>
-            </div>
-          ) : null}
+          {showCompleted && (
+            <CompletedOrdersTable
+              orders={completedOrders}
+              onViewOrder={setViewingOrder}
+              isAdmin={isAdmin}
+              showCompany={false}
+              showAmount={false}
+              itemsPerPage={10}
+              emptyMessage="No completed orders yet"
+            />
+          )}
         </section>
       </main>
 

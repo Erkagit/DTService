@@ -9,3 +9,4 @@ export { StatCard } from './StatCard';
 export { ConfirmModal } from './ConfirmModal';
 export { Dropdown } from './Dropdown';
 export { Skeleton, CardSkeleton, TableSkeleton, GridSkeleton, PageLoader, StatCardSkeleton } from './Skeleton';
+export { CompletedOrdersTable } from './CompletedOrdersTable';
