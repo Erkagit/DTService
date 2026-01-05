@@ -1,6 +1,5 @@
-import { Building2, Users as UsersIcon, Package, UserPlus, Edit2, Trash2 } from 'lucide-react';
-import { Card, CardHeader, CardFooter } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { Building2, Users as UsersIcon, Package, UserPlus, Edit2, Trash2, ChevronRight } from 'lucide-react';
+import { Card } from '@/components/ui/Card';
 import { useRouter } from 'next/navigation';
 import type { CompanyCardProps } from '@/types/types';
 
@@ -12,80 +11,76 @@ export function CompanyCard({ company, onAddUser, onViewDetails, onEdit, onDelet
   };
 
   return (
-    <Card hover>
-      <CardHeader>
-        <div 
-          className="flex items-start justify-between mb-4 cursor-pointer"
-          onClick={handleCardClick}
-        >
-          <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900 mb-3 hover:text-purple-600 transition-colors">
-              {company.name}
-            </h3>
-            <div className="space-y-2">
-              {company._count && (
-                <>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <UsersIcon className="w-4 h-4 text-gray-400" />
-                    <span>{company._count.users} Хэрэглэгч</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Package className="w-4 h-4 text-gray-400" />
-                    <span>{company._count.orders} Захиалга</span>
-                  </div>
-                </>
-              )}
+    <Card className="group hover:shadow-lg transition-all duration-300">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Building2 className="w-5 h-5 text-purple-600" />
+            </div>
+            <h3 className="font-semibold text-gray-900 truncate">{company.name}</h3>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div 
+        className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={handleCardClick}
+      >
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+            <UsersIcon className="w-4 h-4 text-purple-500" />
+            <div>
+              <p className="text-lg font-bold text-gray-900">{company._count?.users || 0}</p>
+              <p className="text-xs text-gray-500">Хэрэглэгч</p>
             </div>
           </div>
-          <div className="p-3 bg-purple-100 rounded-lg">
-            <Building2 className="w-6 h-6 text-purple-600" />
+          <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+            <Package className="w-4 h-4 text-blue-500" />
+            <div>
+              <p className="text-lg font-bold text-gray-900">{company._count?.orders || 0}</p>
+              <p className="text-xs text-gray-500">Захиалга</p>
+            </div>
           </div>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardFooter className="pt-4 border-t border-gray-100">
-        <div className="flex flex-col sm:flex-row gap-2 w-full">
-          <Button
+      {/* Action Buttons - Small & Compact */}
+      <div className="px-4 pb-4">
+        <div className="flex items-center gap-1.5">
+          <button
             onClick={(e) => {
               e.stopPropagation();
               onAddUser(company);
             }}
-            variant="ghost"
-            icon={UserPlus}
-            fullWidth
-            className="bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-200"
+            className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-md transition-colors"
           >
-            <span className="hidden sm:inline">User add</span>
-            <span className="sm:hidden">User add</span>
-          </Button>
-          <div className="flex gap-2 sm:flex-none">
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(company);
-              }}
-              variant="ghost"
-              size="md"
-              icon={Edit2}
-              className="flex-1 sm:flex-none bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
-            >
-              <span className="hidden sm:inline">Edit</span>
-            </Button>
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(company);
-              }}
-              variant="ghost"
-              size="md"
-              icon={Trash2}
-              className="flex-1 sm:flex-none bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
-            >
-              <span className="hidden sm:inline">Delete</span>
-            </Button>
-          </div>
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>User</span>
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(company);
+            }}
+            className="flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(company);
+            }}
+            className="flex items-center justify-center gap-1 px-2 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
-      </CardFooter>
+      </div>
     </Card>
   );
 }

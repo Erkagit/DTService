@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Trash2, Eye, Building2, MapPin, Package, Truck } from 'lucide-react';
 import type { PreOrder } from '@/types/types';
 import { VEHICLE_TYPE_LABELS, TRAILER_TYPE_LABELS } from '@/types/types';
+import { formatCurrency } from '@/utils';
 
 interface PreOrderCardProps {
   preOrder: PreOrder;
@@ -14,11 +15,6 @@ interface PreOrderCardProps {
 }
 
 export function PreOrderCard({ preOrder, onView, onDelete, onCreateOrder }: PreOrderCardProps) {
-  const formatCurrency = (value: number | null) => {
-    if (value === null) return '-';
-    return new Intl.NumberFormat('mn-MN').format(value) + '₮';
-  };
-
   return (
     <Card className="p-4 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-3">

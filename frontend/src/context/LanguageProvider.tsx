@@ -26,6 +26,20 @@ const translations: Record<string, Record<Language, string>> = {
   'nav.companyAdmin': { MN: 'Компанийн Админ', EN: 'Company Admin', CN: '公司管理员' },
   'nav.logout': { MN: 'Гарах', EN: 'Logout', CN: '退出登录' },
   'nav.deliveryTracking': { MN: 'Delivery Tracking', EN: 'Delivery Tracking', CN: '运输跟踪' },
+  'nav.reports': { MN: 'Тайлан', EN: 'Reports', CN: '报告' },
+
+  // REPORTS PAGE
+  'reports.title': { MN: 'Тайлан', EN: 'Reports', CN: '报告' },
+  'reports.subtitle': { MN: 'Захиалгын дэлгэрэнгүй тайлан', EN: 'Detailed order reports', CN: '订单详细报告' },
+  'reports.search': { MN: 'Хайх...', EN: 'Search...', CN: '搜索...' },
+  'reports.allStatus': { MN: 'Бүх статус', EN: 'All status', CN: '所有状态' },
+  'reports.allCompanies': { MN: 'Бүх компани', EN: 'All companies', CN: '所有公司' },
+  'reports.export': { MN: 'Экспорт', EN: 'Export', CN: '导出' },
+  'reports.noResults': { MN: 'Үр дүн олдсонгүй', EN: 'No results found', CN: '未找到结果' },
+  'reports.totalOrders': { MN: 'Нийт захиалга', EN: 'Total orders', CN: '总订单' },
+  'reports.totalAmount': { MN: 'Нийт дүн', EN: 'Total amount', CN: '总金额' },
+  'reports.completed': { MN: 'Дууссан', EN: 'Completed', CN: '已完成' },
+  'reports.pending': { MN: 'Хүлээгдэж буй', EN: 'Pending', CN: '待处理' },
 
   // DASHBOARD
   'dashboard.title': { MN: 'Хянах самбар', EN: 'Dashboard', CN: '仪表盘' },

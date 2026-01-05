@@ -16,6 +16,7 @@ import {
   X,
   Globe,
   FileBox,
+  FileSpreadsheet,
   Loader2
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -63,6 +64,7 @@ export default function MainLayout({
       { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard },
       { nameKey: 'nav.orders', href: '/orders', icon: Package },
       { nameKey: 'nav.preOrders', href: '/preorders', icon: FileBox },
+      { nameKey: 'nav.reports', href: '/reports', icon: FileSpreadsheet },
       { nameKey: 'nav.vehicles', href: '/vehicles', icon: Truck },
       { nameKey: 'nav.companies', href: '/companies', icon: Building2 },
       { nameKey: 'nav.users', href: '/users', icon: Users },

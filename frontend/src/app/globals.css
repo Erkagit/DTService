@@ -26,6 +26,31 @@ body {
   overflow-x: hidden;
 }
 
+/* Make all placeholders more visible */
+::placeholder {
+  color: #6b7280 !important; /* gray-500 */
+  opacity: 1;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important; /* gray-500 */
+  opacity: 1;
+}
+
+/* Make input text always dark and visible */
+input,
+textarea,
+select {
+  color: #111827 !important; /* gray-900 - very dark */
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  color: #111827 !important;
+}
+
 /* Prevent horizontal scrolling on mobile - but allow modals and specific components to exceed */
 * {
   max-width: 100%;

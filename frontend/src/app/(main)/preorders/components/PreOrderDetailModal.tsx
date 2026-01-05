@@ -7,6 +7,7 @@ import { Building2, MapPin, Package, Truck, FileCheck, DollarSign, CreditCard, S
 import type { PreOrder } from '@/types/types';
 import { VEHICLE_TYPE_LABELS, TRAILER_TYPE_LABELS } from '@/types/types';
 import { useAuth } from '@/context/AuthProvider';
+import { formatCurrency } from '@/utils';
 
 interface PreOrderDetailModalProps {
   isOpen: boolean;
@@ -59,11 +60,6 @@ export function PreOrderDetailModal({ isOpen, onClose, preOrder, onUpdate, isUpd
     if (onUpdate && hasChanges) {
       onUpdate(paymentData);
     }
-  };
-
-  const formatCurrency = (value: number | null) => {
-    if (value === null || value === 0) return '-';
-    return new Intl.NumberFormat('mn-MN').format(value) + '₮';
   };
 
   return (

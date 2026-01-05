@@ -2,76 +2,13 @@ import { Router } from 'express';
 import { prisma } from '../libs/prisma';
 import { requireRole } from '../middleware/auth';
 import { Role, OrderStatus } from '@prisma/client';
+import { 
+  ALLOWED_TRANSITIONS, 
+  getPreviousStatus, 
+  isValidTransition 
+} from '../utils';
 
 const router = Router();
-
-// Allowed status transitions - Sequential workflow with cancel option at each step
-const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  PENDING: [OrderStatus.LOADING, OrderStatus.CANCELLED],
-  LOADING: [OrderStatus.TRANSFER_LOADING, OrderStatus.CANCELLED],
-  TRANSFER_LOADING: [OrderStatus.CN_EXPORT_CUSTOMS, OrderStatus.CANCELLED],
-  CN_EXPORT_CUSTOMS: [OrderStatus.MN_IMPORT_CUSTOMS, OrderStatus.CANCELLED],
-  MN_IMPORT_CUSTOMS: [OrderStatus.IN_TRANSIT, OrderStatus.CANCELLED],
-  IN_TRANSIT: [OrderStatus.ARRIVED_AT_SITE, OrderStatus.CANCELLED],
-  ARRIVED_AT_SITE: [OrderStatus.UNLOADED, OrderStatus.CANCELLED],
-  UNLOADED: [OrderStatus.RETURN_TRIP, OrderStatus.CANCELLED],
-  RETURN_TRIP: [OrderStatus.MN_EXPORT_RETURN, OrderStatus.CANCELLED],
-  MN_EXPORT_RETURN: [OrderStatus.CN_IMPORT_RETURN, OrderStatus.CANCELLED],
-  CN_IMPORT_RETURN: [OrderStatus.TRANSFER, OrderStatus.CANCELLED],
-  TRANSFER: [OrderStatus.COMPLETED, OrderStatus.CANCELLED],
-  COMPLETED: [],
-  CANCELLED: []
-};
-
-// Helper function to get previous status in the workflow
-const getPreviousStatus = (currentStatus: OrderStatus): OrderStatus | null => {
-  const statusOrder: OrderStatus[] = [
-    OrderStatus.PENDING,
-    OrderStatus.LOADING,
-    OrderStatus.TRANSFER_LOADING,
-    OrderStatus.CN_EXPORT_CUSTOMS,
-    OrderStatus.MN_IMPORT_CUSTOMS,
-    OrderStatus.IN_TRANSIT,
-    OrderStatus.ARRIVED_AT_SITE,
-    OrderStatus.UNLOADED,
-    OrderStatus.RETURN_TRIP,
-    OrderStatus.MN_EXPORT_RETURN,
-    OrderStatus.CN_IMPORT_RETURN,
-    OrderStatus.TRANSFER,
-    OrderStatus.COMPLETED
-  ];
-  
-  const currentIndex = statusOrder.indexOf(currentStatus);
-  if (currentIndex <= 0) return null;
-  return statusOrder[currentIndex - 1];
-};
-
-// Helper function to check if status transition is valid
-const isValidTransition = (fromStatus: OrderStatus, toStatus: OrderStatus): boolean => {
-  // Can't change from COMPLETED or CANCELLED
-  if (fromStatus === OrderStatus.COMPLETED || fromStatus === OrderStatus.CANCELLED) {
-    return false;
-  }
-  
-  // Can always go to CANCELLED (except from COMPLETED)
-  if (toStatus === OrderStatus.CANCELLED) {
-    return true;
-  }
-  
-  // Check if it's a forward transition
-  const allowedForward = ALLOWED_TRANSITIONS[fromStatus] || [];
-  if (allowedForward.includes(toStatus)) {
-    return true;
-  }
-  
-  // Check if it's a backward transition (one step back)
-  const previousStatus = getPreviousStatus(fromStatus);
-  if (previousStatus && previousStatus === toStatus) {
-    return true;
-  }
-  
-  return false;
-};
 
 // Basic CRUD operations for orders
 router.get('/', async (_req, res) => {

@@ -70,13 +70,16 @@ export function OrderCard({
   onQuickUpdate,
   onDelete,
   onChangeVehicle,
+  onViewDetails,
   isDeleting = false,
   isChangingVehicle = false,
-}: OrderCardProps & { isDeleting?: boolean; isChangingVehicle?: boolean }) {
+  isAdmin = false,
+}: OrderCardProps & { isDeleting?: boolean; isChangingVehicle?: boolean; isAdmin?: boolean; onViewDetails?: (order: any) => void }) {
   const [showEditMenu, setShowEditMenu] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   
   const preOrder = order.preOrders && order.preOrders.length > 0 ? order.preOrders[0] : null;
+  const isCompletedOrder = order.status === 'COMPLETED' || order.status === 'CANCELLED';
   const hasPreOrderData = !!preOrder;
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -105,8 +108,17 @@ export function OrderCard({
     }
   };
 
+  const handleCardClick = () => {
+    if (isCompletedOrder && onViewDetails) {
+      onViewDetails(order);
+    }
+  };
+
   return (
-    <Card className="hover:shadow-lg transition-all duration-200">
+    <Card 
+      className={`hover:shadow-lg transition-all duration-200 ${isCompletedOrder && onViewDetails ? 'cursor-pointer' : ''}`}
+      onClick={handleCardClick}
+    >
       {/* Header Section */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex justify-between items-start">
@@ -223,7 +235,8 @@ export function OrderCard({
                   <p className="font-semibold text-gray-900">{order.vehicle.plateNo}</p>
                   <p className="text-sm text-gray-500">{order.vehicle.driverName}</p>
                 </div>
-                {order.vehicle.driverPhone && (
+                {/* Driver phone - зөвхөн Admin-д харагдана */}
+                {isAdmin && order.vehicle.driverPhone && (
                   <a 
                     href={`tel:${order.vehicle.driverPhone}`}
                     className="text-blue-600 text-sm hover:underline"
@@ -238,8 +251,8 @@ export function OrderCard({
           )}
         </Section>
 
-        {/* PreOrder Details - Collapsible */}
-        {hasPreOrderData && (
+        {/* PreOrder Details - Collapsible - зөвхөн Admin-д харагдана */}
+        {isAdmin && hasPreOrderData && (
           <>
             <button
               onClick={() => setIsExpanded(!isExpanded)}
