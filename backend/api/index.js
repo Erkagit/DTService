@@ -400,28 +400,187 @@ app.delete('/api/orders/:id', async (req, res) => {
 
 // PreOrders
 app.get('/api/preorders', async (req, res) => {
-  const preOrders = await getPrisma().preOrder.findMany({
-    include: { company: true },
-    orderBy: { createdAt: 'desc' }
-  });
-  res.json(preOrders);
+  try {
+    const preOrders = await getPrisma().preOrder.findMany({
+      where: {
+        orderId: null  // Only get pre-orders that haven't been converted to orders
+      },
+      include: { company: true, order: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(preOrders);
+  } catch (error) {
+    console.error('Get preorders error:', error);
+    res.status(500).json({ error: 'Failed to fetch preorders', details: error.message });
+  }
+});
+
+// Get single preorder by ID
+app.get('/api/preorders/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const preOrder = await getPrisma().preOrder.findUnique({
+      where: { id },
+      include: { company: true, order: true }
+    });
+    if (!preOrder) {
+      return res.status(404).json({ error: 'PreOrder not found' });
+    }
+    res.json(preOrder);
+  } catch (error) {
+    console.error('Get preorder error:', error);
+    res.status(500).json({ error: 'Failed to fetch preorder', details: error.message });
+  }
 });
 
 app.post('/api/preorders', async (req, res) => {
-  const preOrder = await getPrisma().preOrder.create({
-    data: req.body,
-    include: { company: true }
-  });
-  res.json(preOrder);
+  try {
+    const {
+      companyId,
+      pickupAddress,
+      deliveryAddress,
+      name,
+      weight,
+      dimension,
+      loadingCost,
+      transportCost,
+      transshipmentCost,
+      exportCustomsCost,
+      mongolTransportCost,
+      importCustomsCost,
+      profit,
+      expense,
+      totalAmount,
+      invoice,
+      packageList,
+      originDoc,
+      vehicleType,
+      foreignVehicleCount,
+      mongolVehicleCount,
+      trailerType,
+      hasContainer,
+      containerNumber,
+      invoiceSent,
+      paymentReceived,
+      idleTime,
+      transportDone,
+      orderId,
+    } = req.body;
+
+    const preOrder = await getPrisma().preOrder.create({
+      data: {
+        companyId: companyId ? parseInt(companyId) : null,
+        pickupAddress,
+        deliveryAddress,
+        name,
+        weight: weight ? parseFloat(weight) : null,
+        dimension,
+        loadingCost: loadingCost ? parseFloat(loadingCost) : null,
+        transportCost: transportCost ? parseFloat(transportCost) : null,
+        transshipmentCost: transshipmentCost ? parseFloat(transshipmentCost) : null,
+        exportCustomsCost: exportCustomsCost ? parseFloat(exportCustomsCost) : null,
+        mongolTransportCost: mongolTransportCost ? parseFloat(mongolTransportCost) : null,
+        importCustomsCost: importCustomsCost ? parseFloat(importCustomsCost) : null,
+        profit: profit ? parseFloat(profit) : null,
+        expense: expense ? parseFloat(expense) : null,
+        totalAmount: totalAmount ? parseFloat(totalAmount) : null,
+        invoice: invoice || false,
+        packageList: packageList || false,
+        originDoc: originDoc || false,
+        vehicleType: vehicleType || 'DEFAULT',
+        foreignVehicleCount: foreignVehicleCount ? parseInt(foreignVehicleCount) : null,
+        mongolVehicleCount: mongolVehicleCount ? parseInt(mongolVehicleCount) : null,
+        trailerType: trailerType || null,
+        hasContainer: hasContainer || 'NO',
+        containerNumber,
+        invoiceSent: invoiceSent || false,
+        paymentReceived: paymentReceived || false,
+        idleTime: idleTime || false,
+        transportDone: transportDone || false,
+        orderId: orderId ? parseInt(orderId) : null,
+      },
+      include: { company: true, order: true }
+    });
+    res.status(201).json(preOrder);
+  } catch (error) {
+    console.error('Create preorder error:', error);
+    res.status(500).json({ error: 'Failed to create preorder', details: error.message });
+  }
 });
 
 app.put('/api/preorders/:id', async (req, res) => {
-  const preOrder = await getPrisma().preOrder.update({
-    where: { id: parseInt(req.params.id) },
-    data: req.body,
-    include: { company: true }
-  });
-  res.json(preOrder);
+  try {
+    const id = parseInt(req.params.id);
+    const {
+      companyId,
+      pickupAddress,
+      deliveryAddress,
+      name,
+      weight,
+      dimension,
+      loadingCost,
+      transportCost,
+      transshipmentCost,
+      exportCustomsCost,
+      mongolTransportCost,
+      importCustomsCost,
+      profit,
+      expense,
+      totalAmount,
+      invoice,
+      packageList,
+      originDoc,
+      vehicleType,
+      foreignVehicleCount,
+      mongolVehicleCount,
+      trailerType,
+      hasContainer,
+      containerNumber,
+      invoiceSent,
+      paymentReceived,
+      idleTime,
+      transportDone,
+    } = req.body;
+
+    const preOrder = await getPrisma().preOrder.update({
+      where: { id },
+      data: {
+        companyId: companyId !== undefined ? (companyId ? parseInt(companyId) : null) : undefined,
+        pickupAddress,
+        deliveryAddress,
+        name,
+        weight: weight !== undefined ? (weight ? parseFloat(weight) : null) : undefined,
+        dimension,
+        loadingCost: loadingCost !== undefined ? (loadingCost ? parseFloat(loadingCost) : null) : undefined,
+        transportCost: transportCost !== undefined ? (transportCost ? parseFloat(transportCost) : null) : undefined,
+        transshipmentCost: transshipmentCost !== undefined ? (transshipmentCost ? parseFloat(transshipmentCost) : null) : undefined,
+        exportCustomsCost: exportCustomsCost !== undefined ? (exportCustomsCost ? parseFloat(exportCustomsCost) : null) : undefined,
+        mongolTransportCost: mongolTransportCost !== undefined ? (mongolTransportCost ? parseFloat(mongolTransportCost) : null) : undefined,
+        importCustomsCost: importCustomsCost !== undefined ? (importCustomsCost ? parseFloat(importCustomsCost) : null) : undefined,
+        profit: profit !== undefined ? (profit ? parseFloat(profit) : null) : undefined,
+        expense: expense !== undefined ? (expense ? parseFloat(expense) : null) : undefined,
+        totalAmount: totalAmount !== undefined ? (totalAmount ? parseFloat(totalAmount) : null) : undefined,
+        invoice: invoice !== undefined ? invoice : undefined,
+        packageList: packageList !== undefined ? packageList : undefined,
+        originDoc: originDoc !== undefined ? originDoc : undefined,
+        vehicleType: vehicleType !== undefined ? vehicleType : undefined,
+        foreignVehicleCount: foreignVehicleCount !== undefined ? (foreignVehicleCount ? parseInt(foreignVehicleCount) : null) : undefined,
+        mongolVehicleCount: mongolVehicleCount !== undefined ? (mongolVehicleCount ? parseInt(mongolVehicleCount) : null) : undefined,
+        trailerType: trailerType !== undefined ? trailerType : undefined,
+        hasContainer: hasContainer !== undefined ? hasContainer : undefined,
+        containerNumber,
+        invoiceSent: invoiceSent !== undefined ? invoiceSent : undefined,
+        paymentReceived: paymentReceived !== undefined ? paymentReceived : undefined,
+        idleTime: idleTime !== undefined ? idleTime : undefined,
+        transportDone: transportDone !== undefined ? transportDone : undefined,
+      },
+      include: { company: true, order: true }
+    });
+    res.json(preOrder);
+  } catch (error) {
+    console.error('Update preorder error:', error);
+    res.status(500).json({ error: 'Failed to update preorder', details: error.message });
+  }
 });
 
 app.delete('/api/preorders/:id', async (req, res) => {
