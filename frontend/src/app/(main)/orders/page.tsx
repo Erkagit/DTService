@@ -33,7 +33,7 @@ const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 };
 
 export default function OrdersPage() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -48,7 +48,8 @@ export default function OrdersPage() {
   const [changingVehicleOrderId, setChangingVehicleOrderId] = useState<number | null>(null);
   
   // CLIENT_ADMIN can only VIEW orders, not modify them
-  const isAdmin = user?.role === 'ADMIN';
+  // Use uppercase comparison for consistency
+  const isAdmin = user?.role?.toUpperCase() === 'ADMIN';
   
   const [formData, setFormData] = useState({
     origin: '',
@@ -64,7 +65,7 @@ export default function OrdersPage() {
       let filteredOrders = res.data;
       
       // Filter orders for CLIENT_ADMIN - only show their company's orders
-      if (user?.role === 'CLIENT_ADMIN' && user.companyId) {
+      if (user?.role?.toUpperCase() === 'CLIENT_ADMIN' && user.companyId) {
         filteredOrders = filteredOrders.filter((order: any) => order.companyId === user.companyId);
       }
       
@@ -73,6 +74,8 @@ export default function OrdersPage() {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
     },
+    // Only fetch when auth is loaded
+    enabled: !authLoading,
   });
 
   const { data: vehicles } = useQuery({
@@ -89,7 +92,7 @@ export default function OrdersPage() {
       const res = await companiesApi.getAll();
       return res.data;
     },
-    enabled: user?.role === 'ADMIN',
+    enabled: user?.role?.toUpperCase() === 'ADMIN',
   });
 
     const createOrderMutation = useMutation({
@@ -219,7 +222,7 @@ export default function OrdersPage() {
   };
 
   const canUpdateStatus = (order: any) => {
-    return user?.role === 'ADMIN' && order.status !== 'COMPLETED' && order.status !== 'CANCELLED';
+    return user?.role?.toUpperCase() === 'ADMIN' && order.status !== 'COMPLETED' && order.status !== 'CANCELLED';
   };
 
   const STATUS_ORDER: OrderStatus[] = [
@@ -323,7 +326,7 @@ export default function OrdersPage() {
       <PageHeader
         icon={<Package className="w-8 h-8 text-white" />}
         title={t('orders.title')}
-        subtitle={user?.role === 'CLIENT_ADMIN' ? t('orders.viewOnly') || 'Зөвхөн харах эрхтэй' : t('orders.subtitle')}
+        subtitle={user?.role?.toUpperCase() === 'CLIENT_ADMIN' ? t('orders.viewOnly') || 'Зөвхөн харах эрхтэй' : t('orders.subtitle')}
         action={
           isAdmin ? (
             <Button icon={Plus} onClick={handleCreateClick}>

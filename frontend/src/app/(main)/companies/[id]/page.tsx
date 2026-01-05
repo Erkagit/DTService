@@ -107,7 +107,7 @@ export default function CompanyDetailPage() {
   };
 
   const canUpdateStatus = (order: any) => {
-    return user?.role === 'ADMIN' && order.status !== 'COMPLETED' && order.status !== 'CANCELLED';
+    return user?.role?.toUpperCase() === 'ADMIN' && order.status !== 'COMPLETED' && order.status !== 'CANCELLED';
   };
 
   const handleQuickStatusUpdate = () => {

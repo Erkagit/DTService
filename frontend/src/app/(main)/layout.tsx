@@ -15,9 +15,10 @@ import {
   Menu,
   X,
   Globe,
-  FileBox
+  FileBox,
+  Loader2
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 export default function MainLayout({
   children,
@@ -26,7 +27,7 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { lang, setLang, t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -44,25 +45,41 @@ export default function MainLayout({
   // Navigation items with role-based access
   // CLIENT_ADMIN: Dashboard + Orders (view-only)
   // ADMIN: Full access to all menu items
-  const navigation = user?.role === 'CLIENT_ADMIN' 
-    ? [
-        // CLIENT_ADMIN sees Dashboard and Orders (view-only)
-        { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['CLIENT_ADMIN'] },
-        { nameKey: 'nav.orders', href: '/orders', icon: Package, roles: ['CLIENT_ADMIN'] },
-      ]
-    : [
-        // ADMIN sees all menu items
-        { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN'] },
-        { nameKey: 'nav.orders', href: '/orders', icon: Package, roles: ['ADMIN'] },
-        { nameKey: 'nav.preOrders', href: '/preorders', icon: FileBox, roles: ['ADMIN'] },
-        { nameKey: 'nav.vehicles', href: '/vehicles', icon: Truck, roles: ['ADMIN'] },
-        { nameKey: 'nav.companies', href: '/companies', icon: Building2, roles: ['ADMIN'] },
-        { nameKey: 'nav.users', href: '/users', icon: Users, roles: ['ADMIN'] },
+  // Use useMemo to ensure navigation is computed correctly after user loads
+  const navigation = useMemo(() => {
+    // Explicit role check with uppercase comparison for safety
+    const userRole = user?.role?.toUpperCase();
+    
+    if (userRole === 'CLIENT_ADMIN') {
+      // CLIENT_ADMIN sees Dashboard and Orders (view-only)
+      return [
+        { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { nameKey: 'nav.orders', href: '/orders', icon: Package },
       ];
+    }
+    
+    // ADMIN or any other role sees all menu items (default to full access)
+    return [
+      { nameKey: 'nav.dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { nameKey: 'nav.orders', href: '/orders', icon: Package },
+      { nameKey: 'nav.preOrders', href: '/preorders', icon: FileBox },
+      { nameKey: 'nav.vehicles', href: '/vehicles', icon: Truck },
+      { nameKey: 'nav.companies', href: '/companies', icon: Building2 },
+      { nameKey: 'nav.users', href: '/users', icon: Users },
+    ];
+  }, [user?.role]);
 
-  const filteredNavigation = navigation.filter(item => 
-    user && item.roles.includes(user.role)
-  );
+  // Show loading state while user data is being fetched from localStorage
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+          <span className="text-sm text-gray-500">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return <>{children}</>;
@@ -153,7 +170,7 @@ export default function MainLayout({
 
           {/* Navigation */}
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            {filteredNavigation.map((item) => {
+            {navigation.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
               const Icon = item.icon;
               

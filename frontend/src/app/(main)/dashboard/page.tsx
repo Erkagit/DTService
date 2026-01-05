@@ -23,7 +23,7 @@ export default function DashboardPage() {
       let filteredOrders = res.data;
       
       // Filter orders for CLIENT_ADMIN
-      if (user?.role === 'CLIENT_ADMIN' && user.companyId) {
+      if (user?.role?.toUpperCase() === 'CLIENT_ADMIN' && user.companyId) {
         filteredOrders = filteredOrders.filter((o: any) => o.companyId === user.companyId);
       }
       

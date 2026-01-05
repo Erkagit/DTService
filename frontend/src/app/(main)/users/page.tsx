@@ -19,7 +19,7 @@ export default function UsersPage() {
   
   // Redirect CLIENT_ADMIN to dashboard - they can only access dashboard
   useEffect(() => {
-    if (currentUser?.role === 'CLIENT_ADMIN') {
+    if (currentUser?.role?.toUpperCase() === 'CLIENT_ADMIN') {
       window.location.href = '/dashboard';
     }
   }, [currentUser]);

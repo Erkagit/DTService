@@ -19,7 +19,7 @@ export default function CompaniesPage() {
   
   // Redirect CLIENT_ADMIN to dashboard - they can only access dashboard
   useEffect(() => {
-    if (user?.role === 'CLIENT_ADMIN') {
+    if (user?.role?.toUpperCase() === 'CLIENT_ADMIN') {
       router.replace('/dashboard');
     }
   }, [user, router]);

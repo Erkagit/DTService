@@ -223,7 +223,7 @@ export function PreOrderDetailModal({ isOpen, onClose, preOrder, onUpdate, isUpd
         </div>
 
         {/* Tulbur Section - Төлбөр */}
-        {user?.role === 'ADMIN' && (
+        {user?.role?.toUpperCase() === 'ADMIN' && (
           <div className="bg-orange-50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-orange-800 mb-3 flex items-center gap-2">
               <CreditCard className="w-5 h-5" />
