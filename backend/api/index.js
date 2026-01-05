@@ -35,15 +35,29 @@ app.options('*', cors());
 
 app.use(express.json());
 
-// Initialize Prisma lazily
+// Initialize Prisma with connection pooling for serverless
 let prisma = null;
 const getPrisma = () => {
   if (!prisma) {
     const { PrismaClient } = require('@prisma/client');
-    prisma = new PrismaClient();
+    prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL
+        }
+      },
+      log: ['error', 'warn'],
+    });
   }
   return prisma;
 };
+
+// Graceful shutdown for Prisma
+process.on('beforeExit', async () => {
+  if (prisma) {
+    await prisma.$disconnect();
+  }
+});
 
 // Auth middleware
 const authMiddleware = (req, res, next) => {
