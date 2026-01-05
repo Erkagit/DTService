@@ -106,7 +106,7 @@ export function OrderCard({
   };
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200 overflow-hidden">
+    <Card className="hover:shadow-lg transition-all duration-200">
       {/* Header Section */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex justify-between items-start">

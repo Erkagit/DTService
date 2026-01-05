@@ -312,7 +312,7 @@ app.delete('/api/devices/:id', async (req, res) => {
 // Orders
 app.get('/api/orders', async (req, res) => {
   const orders = await getPrisma().order.findMany({
-    include: { company: true, vehicle: true },
+    include: { company: true, vehicle: true, preOrders: true },
     orderBy: { createdAt: 'desc' }
   });
   res.json(orders);
