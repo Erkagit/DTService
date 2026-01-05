@@ -40,16 +40,33 @@ let prisma = null;
 const getPrisma = () => {
   if (!prisma) {
     const { PrismaClient } = require('@prisma/client');
+    
+    // Add connection pool parameters for Supabase
+    let dbUrl = process.env.DATABASE_URL;
+    if (dbUrl && !dbUrl.includes('connection_limit')) {
+      // Limit connections for serverless environment
+      const separator = dbUrl.includes('?') ? '&' : '?';
+      dbUrl = `${dbUrl}${separator}connection_limit=1&pool_timeout=10`;
+    }
+    
     prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL
+          url: dbUrl
         }
       },
       log: ['error', 'warn'],
     });
   }
   return prisma;
+};
+
+// Disconnect Prisma after each request in serverless
+const disconnectPrisma = async () => {
+  if (prisma) {
+    await prisma.$disconnect();
+    prisma = null;
+  }
 };
 
 // Graceful shutdown for Prisma
