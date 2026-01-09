@@ -15,13 +15,20 @@ export const formatDate = (
 ): string => {
   if (!dateStr) return '-';
   
-  const defaultOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  };
-  
-  return new Date(dateStr).toLocaleDateString('mn-MN', options || defaultOptions);
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '-';
+    
+    const defaultOptions: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+    
+    return date.toLocaleDateString('mn-MN', options || defaultOptions);
+  } catch {
+    return '-';
+  }
 };
 
 /**
@@ -32,13 +39,20 @@ export const formatDate = (
 export const formatDateTime = (dateStr: string | null | undefined): string => {
   if (!dateStr) return '-';
   
-  return new Date(dateStr).toLocaleDateString('mn-MN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '-';
+    
+    return date.toLocaleDateString('mn-MN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return '-';
+  }
 };
 
 /**

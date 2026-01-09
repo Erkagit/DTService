@@ -3,8 +3,6 @@ import type { User, Company, Vehicle, Order, LocationPing, Device, PreOrder } fr
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
 
-console.log('API Base URL:', API_BASE_URL); // Debug log
-
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -15,8 +13,6 @@ const api = axios.create({
 // Request interceptor to add authentication token
 api.interceptors.request.use(
   (config) => {
-    console.log('API Request:', config.method?.toUpperCase(), config.url);
-    
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       if (token) {
@@ -30,14 +26,10 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for debugging and error handling
+// Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', response.status, response.config.url);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('API Error:', error.message, error.config?.url);
     
     // Handle 401 Unauthorized - redirect to landing page
     if (error.response?.status === 401) {

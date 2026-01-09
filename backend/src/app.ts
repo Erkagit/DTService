@@ -24,15 +24,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Debug middleware
-app.use((req, res, next) => {
-  console.log(`\n=== ${new Date().toISOString()} - ${req.method} ${req.path} ===`);
-  console.log('Content-Type:', req.headers['content-type']);
-  console.log('Body:', JSON.stringify(req.body, null, 2));
-  console.log('===\n');
-  next();
-});
-
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ 
@@ -47,30 +38,20 @@ app.get('/health', (_req, res) => {
 // Login endpoint
 app.post('/api/auth/login', async (req, res) => {
   try {
-    console.log('🔐 LOGIN ATTEMPT');
-    console.log('Request body:', req.body);
-    console.log('Email/Name:', req.body?.email);
-    console.log('Password:', req.body?.password);
-    
     const { email, password } = req.body;
     
-    // Check if body was parsed
+    // Validate request body
     if (!req.body || Object.keys(req.body).length === 0) {
-      console.log('❌ Request body is empty!');
       return res.status(400).json({ error: 'Request body is empty' });
     }
     
     if (!email) {
-      console.log('❌ Email/Name missing');
       return res.status(400).json({ error: 'Email or name is required' });
     }
     
     if (!password) {
-      console.log('❌ Password missing from request body');
       return res.status(400).json({ error: 'Password is required' });
     }
-    
-    console.log('✅ Email/Name and password provided');
     
     // Try to find user by email first, then by name
     let user = await prisma.user.findUnique({ 
@@ -81,29 +62,22 @@ app.post('/api/auth/login', async (req, res) => {
     // If not found by email, try finding by name
     if (!user) {
       user = await prisma.user.findFirst({
-        where: { name: email }, // using email field for name input
+        where: { name: email },
         include: { company: true }
       });
     }
     
     if (!user) {
-      console.log('❌ User not found by email or name');
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    console.log('✅ User found:', user.email);
-
     if (!user.password) {
-      console.log('❌ User has no password');
       return res.status(401).json({ error: 'Account password not set' });
     }
 
-    console.log('✅ Comparing passwords...');
     const isValidPassword = await bcrypt.compare(password, user.password);
-    console.log('Password valid:', isValidPassword);
     
     if (!isValidPassword) {
-      console.log('❌ Invalid password');
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
@@ -114,8 +88,6 @@ app.post('/api/auth/login', async (req, res) => {
       companyId: user.companyId || undefined,
     });
     
-    console.log('✅✅✅ Login successful! Token generated.');
-    
     const { password: _, ...userWithoutPassword } = user;
     
     res.json({ 
@@ -124,7 +96,7 @@ app.post('/api/auth/login', async (req, res) => {
       message: 'Login successful'
     });
   } catch (error) {
-    console.error('💥 Login error:', error);
+    console.error('Login error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

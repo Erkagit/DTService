@@ -36,23 +36,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
 
-  const login = (user: User, token: string) => {  // token параметр нэмэх
-  setUser(user);
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('userId', user.id.toString());
-    localStorage.setItem('token', token);  // ✅ token хадгалах
-  }
-};
+  const login = (user: User, token: string) => {
+    setUser(user);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('userId', user.id.toString());
+      localStorage.setItem('token', token);
+    }
+  };
 
-const logout = () => {
-  setUser(null);
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('user');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('token');  // ✅ token устгах
-  }
-};
+  const logout = () => {
+    setUser(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('token');
+    }
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading }}>
