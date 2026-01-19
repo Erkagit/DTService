@@ -893,7 +893,7 @@ export default function LandingPage() {
               <span className="text-white/60 text-sm">© 2025 Achir Bayron LLC. All rights reserved.</span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-white/40 text-sm">Powered by Erka Gantsaaraa</span>
+              <span className="text-white/40 text-sm">Powered by Achir Bairon TeCH</span>
             </div>
           </div>
         </div>
