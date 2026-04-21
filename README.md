@@ -115,16 +115,6 @@ DTS-monorepo/
 
 ---
 
-## 🔐 Default Credentials
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@dts.local | password123 |
-
-⚠️ **Change credentials immediately after deployment!**
-
----
-
 ## 📋 Order Status Flow
 
 ```
